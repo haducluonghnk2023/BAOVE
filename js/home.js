@@ -21,9 +21,9 @@ let DATABASE = localStorage.getItem('DATABASE') ? JSON.parse(localStorage.getIte
         // Set User Default role ADMIN
         {
             ID: generateUUIDV4(),
-            username: "Đinh Sỹ Hùng",
-            phoneNumber: "01672058923",
-            address: "Hải Châu Đà Nẵng",
+            username: "Hạ Đức Lương",
+            phoneNumber: "00000000000000",
+            address: "Phú Thọ",
             email: "admin@gmail.com",
             password: "123",
             role: "Admin"
