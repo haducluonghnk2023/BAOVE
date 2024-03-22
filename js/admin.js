@@ -56,6 +56,7 @@ function generateData() {
 
 // ========================================= PRODUCT MANAGER ===========================================
 
+
 // Declare form input
 let code = document.getElementById('code');
 let category = document.getElementById('category');
@@ -66,16 +67,16 @@ let amount = document.getElementById('amount');
 let entry = document.getElementById('entry');
 let image = document.getElementById("image");
 
+
 // Element Define
 let tbody = document.getElementById('tbody');
-
 window.onload = loadProductManager(PRODUCTS);
-
 function loadProductManager(PRODUCTS) {
     PRODUCTS.forEach(product => {
         renderProduct(product);
     });
 }
+
 
 //  Default Page
 function renderProduct(product) {
@@ -101,10 +102,10 @@ function renderProduct(product) {
     tbody.innerHTML += contents;
 }
 
-// Add New Product
+
+// Thêm mới sản phẩm
 let add_new = document.getElementById('add_new');
 add_new.addEventListener('click', actAddProduct);
-
 function actAddProduct() {
     let images = image.value;
 
@@ -125,7 +126,7 @@ function actAddProduct() {
         renderProduct(product);
         notificationAction("Thêm Sản Phẩm Thành Công.", "#12e64b");
 
-        // Clear Form Input
+        //Xóa dữ liệu đầu vào
         let form_id = document.getElementById('form-id');
         form_id.querySelectorAll('input').forEach(function (input) {
             input.value = '';
@@ -135,6 +136,7 @@ function actAddProduct() {
     add_new.disabled = false;
 }
 
+
 // Validate Form
 function validateForm(product) {
     if (product.code === "" || product.productName === ""
@@ -142,7 +144,7 @@ function validateForm(product) {
         || product.amount === "" || product.entry === "" || product.image === "") {
         notificationAction("Vui Lòng Điền Đầy Đủ Thông Tin.", "#e61212");
 
-        // Error Input
+        // Lỗi đầu vào
         let form_id = document.getElementById('form-id');
         let form_input = form_id.querySelectorAll('input');
 
@@ -160,7 +162,8 @@ function validateForm(product) {
     return true;
 }
 
-// Check exist ProductCode
+
+// Kiểm tra mã sản phẩm đã tồn tại 
 function checkExistProductCode(code) {
     let check = 0;
     PRODUCTS.forEach(function (product) {
@@ -171,7 +174,6 @@ function checkExistProductCode(code) {
         }
     })
 
-    // Stupid :))
     if (check > 0) {
         return true;
     } else {
@@ -180,10 +182,10 @@ function checkExistProductCode(code) {
 
 }
 
-// Display notification
+
+// Hiển thi thông báo
 let notifi = document.getElementById('notifi');
 let notifi_content = document.getElementById('notifi-content');
-
 function notificationAction(content, color) {
     notifi_content.innerHTML = content;
     notifi.style.display = "block";
@@ -196,9 +198,9 @@ function notificationAction(content, color) {
         }, 3000);
 }
 
-// Delete And Update Product
-tbody.addEventListener('click', actProduct);
 
+// Xóa và cập nhật sản phẩm
+tbody.addEventListener('click', actProduct);
 function actProduct(event) {
     let ev = event.target;
     let data_code = ev.getAttribute('data-code');
@@ -218,7 +220,6 @@ function actProduct(event) {
         price.value = productFilter[0].price;
         amount.value = productFilter[0].amount;
         entry.value = productFilter[0].entry;
-        // image.value = productdFilter[0].image;
 
         add_new.style.display = "none";
         update.style.display = "inline-block";
@@ -248,14 +249,12 @@ function actProduct(event) {
     }
 }
 
-// Edit
+// Sửa
 let update = document.getElementById('update');
 update.addEventListener('click', actUpdate);
-
 function actUpdate() {
     PRODUCTS.forEach(function (product) {
         if (product.code === code.value) {
-
             let images = image.value;
             product.idcategory = category.value;
             product.productName = name.value;
@@ -274,29 +273,31 @@ function actUpdate() {
 }
 
 // Search
-let search = document.getElementById("search");
-search.addEventListener('input', actSearch);
+// let search = document.getElementById("search");
+// search.addEventListener('input', actSearch);
 
-function actSearch() {
-    let searchInput = search.value;
-    let productCompare = PRODUCTS.filter(product => searchCompare(searchInput, product.productName));
-    tbody.innerHTML = '';
-    productCompare.forEach(product => {
-        renderProduct(product);
-    });
-}
+// function actSearch() {
+//     let searchInput = search.value;
+//     let productCompare = PRODUCTS.filter(product => searchCompare(searchInput, product.productName));
+//     tbody.innerHTML = '';
+//     productCompare.forEach(product => {
+//         renderProduct(product);
+//     });
+// }
 
 // Search Compare
-function searchCompare(searchInput, productName) {
-    let searchInputLower = searchInput.toLowerCase();
-    let productNameLower = productName.toLowerCase();
-    return productNameLower.includes(searchInputLower);
-}
+// function searchCompare(searchInput, productName) {
+//     let searchInputLower = searchInput.toLowerCase();
+//     let productNameLower = productName.toLowerCase();
+//     return productNameLower.includes(searchInputLower);
+// }
 
 
 // ========================================= ACCOUNT MANAGER ===========================================
 
 // Show Tab
+
+
 let s_product = document.getElementById('s_product');
 let s_user = document.getElementById('s_user');
 let s_order = document.getElementById('s_order');
@@ -308,7 +309,6 @@ let order_manager = document.getElementById('order-manager');
 s_product.addEventListener('click', showProductManager);
 s_user.addEventListener('click', showUserManager);
 s_order.addEventListener('click', showOrderManager);
-
 function showProductManager() {
     product_manager.style.display = 'block';
     user_manager.style.display = 'none';
@@ -330,10 +330,11 @@ function showOrderManager() {
 
 }
 
+
 // ========================================= OPEN TAB MANAGER ===========================================
 
-let user_tbody = document.getElementById('user_tbody');
 
+let user_tbody = document.getElementById('user_tbody');
 function renderAccount() {
     let contents = '';
     ACCOUNTS.forEach(account => {
@@ -350,10 +351,11 @@ function renderAccount() {
     user_tbody.innerHTML = contents;
 }
 
+
 // ========================================= ORDER MANAGER ===========================================
 
-let order_tbody = document.getElementById('order_tbody');
 
+let order_tbody = document.getElementById('order_tbody');
 function renderOrder() {
     let contents = '';
     ORDERS.forEach(order => {
@@ -391,8 +393,7 @@ function renderOrder() {
 
 function actOrderDetail() {
     let order_detail = document.querySelectorAll('#order-detail');
-    // let detail_content = document.getElementById('detail-content');
-
+   
     order_detail.forEach(orderbtn => {
         orderbtn.addEventListener('click', renderOrderDetail);
     })
@@ -491,4 +492,4 @@ function actUpdateOrderStatus() {
 
 }
 
-// Update new commit
+

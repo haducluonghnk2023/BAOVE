@@ -457,15 +457,12 @@ function addToCart() {
     let productCode = this.getAttribute('data-code');
     let products = SESSION.products;
     let productSaveCart;
-
     PRODUCTS.forEach(p => {
         if (p.code === productCode) {
             productSaveCart = p;
         }
     })
-
     let { image, productName, price } = productSaveCart;
-
     let product = {
         code: productCode,
         productName: productName,
@@ -473,7 +470,6 @@ function addToCart() {
         image: image,
         quantity: 1
     }
-
     if (products !== undefined) {
         let check = 0;
         products.forEach(p => {
@@ -482,43 +478,35 @@ function addToCart() {
                 check++;
             }
         })
-
         if (check === 0) {
             products.push(product);
         }
-
     } else {
         SESSION.products = [];
         SESSION.products.push(product);
     }
-
     sessionStorage.setItem('SESSION', JSON.stringify(SESSION));
     alert('Thêm Sản Phẩm Vào Giỏ Hàng Thành Công !');
-
 }
+
 
 // ********************** CART DETAIL **********************
 let checkout = document.getElementById('checkout');
 let body_content = document.getElementById('body-content');
 let body_cart = document.getElementById('body-cart');
-
 let cart_table = document.getElementById('cart-table');
-
 checkout.addEventListener('click', showCartDetail);
-
 function showCartDetail() {
     cartOverlayOff();
     body_content.style.display = 'none';
     body_cart.style.display = 'block';
     renderCartDetail();
 }
-
 function renderCartDetail() {
     let products = SESSION.products;
     let contents = '';
     let total_price = 0;
     let total_quantity = 0;
-
     products.forEach(p => {
         contents += `
         <tr>
@@ -540,7 +528,6 @@ function renderCartDetail() {
         total_price += p.price * p.quantity;
         total_quantity += p.quantity;
     });
-
     cart_table.innerHTML = contents;
     document.getElementById('payment-info').innerHTML = `
         <div class="col-6">
@@ -558,7 +545,6 @@ function renderCartDetail() {
     `;
     loadUserInfo();
 }
-
 function loadUserInfo() {
     ACCOUNTS.forEach(function (account) {
         if (account.ID === SESSION.userID) {
@@ -572,7 +558,6 @@ let customer_address = document.getElementById('customer-address');
 let customer_email = document.getElementById('customer-email');
 let customer_note = document.getElementById('customer-note');
 let customer_check = document.getElementById('customer-check');
-
 function renderUserInfo(account) {
     customer_name.value = account.username;
     customer_number.value = account.phoneNumber;
@@ -580,13 +565,12 @@ function renderUserInfo(account) {
     customer_email.value = account.email;
 }
 
+
 // ********************** CART ACTION **********************
 cart_table.addEventListener('click', actCartProduct);
-
 function actCartProduct(event) {
     let ev = event.target;
     let data_code = ev.getAttribute('data-code');
-
     if (ev.matches('#minus')) {
         let nValue = parseInt(ev.nextElementSibling.value) - 1;
         if (nValue <= 0) {
@@ -597,13 +581,11 @@ function actCartProduct(event) {
         }
         updateCartProduct(data_code, nValue);
     }
-
     if (ev.matches('#plus')) {
         let nValue = parseInt(ev.previousElementSibling.value) + 1;
         ev.previousElementSibling.value = nValue;
         updateCartProduct(data_code, nValue);
     }
-
     if (ev.matches('#remove')) {
         let products = SESSION.products;
         products = products.filter(product => product.code !== data_code);
@@ -612,19 +594,17 @@ function actCartProduct(event) {
         renderCartDetail();
     }
 }
-
 function updateCartProduct(code, nQuantity) {
     let products = SESSION.products;
-
     products.forEach(p => {
         if (p.code === code) {
             p.quantity = nQuantity;
         }
     })
-
     sessionStorage.setItem('SESSION', JSON.stringify(SESSION));
     renderCartDetail();
 }
+
 
 // ********************** ORDER ACTION **********************
 let order_btn = document.getElementById('order');
