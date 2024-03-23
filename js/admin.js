@@ -27,6 +27,7 @@ let DATABASE = localStorage.getItem('DATABASE') ? JSON.parse(localStorage.getIte
             email: "admin@gmail.com",
             password: "123",
             role: "Admin"
+            
         }
     ],
     ORDERS: []
@@ -58,6 +59,7 @@ function generateData() {
 
 
 // Declare form input
+let stt = document.getElementById('stt');
 let code = document.getElementById('code');
 let category = document.getElementById('category');
 let name = document.getElementById('name');
@@ -76,12 +78,11 @@ function loadProductManager(PRODUCTS) {
         renderProduct(product);
     });
 }
-
-
 //  Default Page
 function renderProduct(product) {
     let contents = `
         <tr>
+           
             <th scope="row">${product.code}</th>
             <td>
                 <img width="120" height="80" src="images/${product.image}">
@@ -103,6 +104,7 @@ function renderProduct(product) {
 }
 
 
+
 // Thêm mới sản phẩm
 let add_new = document.getElementById('add_new');
 add_new.addEventListener('click', actAddProduct);
@@ -110,7 +112,7 @@ function actAddProduct() {
     let images = image.value;
 
     let product = {
-        code: code.value,
+        code: code.value,   
         idcategory: category.value,
         productName: name.value,
         material: material.value,
@@ -135,7 +137,6 @@ function actAddProduct() {
     }
     add_new.disabled = false;
 }
-
 
 // Validate Form
 function validateForm(product) {
@@ -273,24 +274,24 @@ function actUpdate() {
 }
 
 // Search
-// let search = document.getElementById("search");
-// search.addEventListener('input', actSearch);
+let search = document.getElementById("search");
+search.addEventListener('input', actSearch);
 
-// function actSearch() {
-//     let searchInput = search.value;
-//     let productCompare = PRODUCTS.filter(product => searchCompare(searchInput, product.productName));
-//     tbody.innerHTML = '';
-//     productCompare.forEach(product => {
-//         renderProduct(product);
-//     });
-// }
+function actSearch() {
+    let searchInput = search.value;
+    let productCompare = PRODUCTS.filter(product => searchCompare(searchInput, product.productName));
+    tbody.innerHTML = '';
+    productCompare.forEach(product => {
+        renderProduct(product);
+    });
+}
 
 // Search Compare
-// function searchCompare(searchInput, productName) {
-//     let searchInputLower = searchInput.toLowerCase();
-//     let productNameLower = productName.toLowerCase();
-//     return productNameLower.includes(searchInputLower);
-// }
+function searchCompare(searchInput, productName) {
+    let searchInputLower = searchInput.toLowerCase();
+    let productNameLower = productName.toLowerCase();
+    return productNameLower.includes(searchInputLower);
+}
 
 
 // ========================================= ACCOUNT MANAGER ===========================================
@@ -301,24 +302,37 @@ function actUpdate() {
 let s_product = document.getElementById('s_product');
 let s_user = document.getElementById('s_user');
 let s_order = document.getElementById('s_order');
+let s_category = document.getElementById('s_category');
 
 let product_manager = document.getElementById('product-manager');
 let user_manager = document.getElementById('user-manager');
 let order_manager = document.getElementById('order-manager');
+let category_manager = document.getElementById('category-manager');
+
+let categoriess = document.getElementById('category');
 
 s_product.addEventListener('click', showProductManager);
 s_user.addEventListener('click', showUserManager);
 s_order.addEventListener('click', showOrderManager);
+s_category.addEventListener('click',showCategoryManager);
 function showProductManager() {
     product_manager.style.display = 'block';
     user_manager.style.display = 'none';
     order_manager.style.display = 'none';
-}
+    category_manager.style.display = 'none';
 
+}
+function showCategoryManager() {
+    product_manager.style.display = 'block';
+    user_manager.style.display = 'none';
+    order_manager.style.display = 'none';
+    category_manager.style.display = 'block';
+}
 function showUserManager() {
     product_manager.style.display = 'none';
     user_manager.style.display = 'block';
     order_manager.style.display = 'none';
+    category_manager.style.display = 'none';
     renderAccount();
 }
 
@@ -326,9 +340,41 @@ function showOrderManager() {
     product_manager.style.display = 'none';
     user_manager.style.display = 'none';
     order_manager.style.display = 'block';
+    category_manager.style.display = 'none';
     renderOrder();
-
 }
+// // Xử lý sự kiện khi nhấn vào nút "Thêm vào danh mục"
+// document.querySelectorAll('.add-to-category').forEach(button => {
+//     button.addEventListener('click', function() {
+//         const category = this.dataset.category;
+//         // Thực hiện thêm loại sản phẩm vào danh mục của sản phẩm hiện tại
+//         addCategoryToProduct(category);
+//         // Hiển thị thông báo hoặc thực hiện các hành động khác nếu cần
+//     });
+// });
+
+// // Hàm thêm loại sản phẩm vào danh mục của sản phẩm hiện tại
+// function addCategoryToProduct(category) {
+//     // Lấy giá trị mã sản phẩm từ ô input hoặc từ nơi phù hợp
+//     const productCode = document.getElementById('code').value;
+//     // Tìm sản phẩm trong danh sách sản phẩm
+//     const product = PRODUCTS.find(product => product.code === productCode);
+//     if (product) {
+//         // Kiểm tra xem loại sản phẩm đã tồn tại trong danh mục chưa
+//         if (!product.categories.includes(category)) {
+//             // Nếu chưa tồn tại, thêm loại sản phẩm vào danh mục của sản phẩm
+//             product.categories.push(category);
+//             // Lưu thay đổi vào cơ sở dữ liệu hoặc nơi lưu trữ dữ liệu khác
+//             localStorage.setItem('DATABASE', JSON.stringify(DATABASE));
+//             // Cập nhật giao diện nếu cần
+//         } else {
+//             // Thông báo rằng loại sản phẩm đã tồn tại trong danh mục
+//         }
+//     } else {
+//         // Thông báo rằng không tìm thấy sản phẩm
+//     }
+// }
+
 
 
 // ========================================= OPEN TAB MANAGER ===========================================
@@ -346,15 +392,78 @@ function renderAccount() {
                 <td>${account.address}</td>
                 <td>${account.email}</td>
                 <td>${account.role}</td>
+                <td>${account.status}</td>
             </tr>`;
     })
     user_tbody.innerHTML = contents;
 }
 
+// CATEGORY MANAGER =========================================
+const categories = [
+    "Quần nam",
+    "Quần nữ",
+    "Áo nam",
+    "Áo nữ",
+    "Giày nam",
+    "Giày nữ",
+    "Dép nam",
+    "Dép nữ",
+    "Phụ kiện"
+];
+
+// Lấy thẻ tbody trong bảng
+const tbodyA = document.getElementById("category_tbody");
+
+// Duyệt qua mỗi loại sản phẩm và tạo các hàng trong bảng
+categories.forEach(category => {
+    // Tạo một hàng mới
+    const row = document.createElement("tr");
+
+    // Tạo cột cho loại sản phẩm
+    const categoryCell = document.createElement("td");
+    categoryCell.textContent = category;
+    row.appendChild(categoryCell);
+
+    // Tạo cột cho nút "Thêm vào danh mục"
+    const buttonCell = document.createElement("td");
+    const addButton = document.createElement("button");
+    addButton.textContent = "Thêm vào danh mục";
+    addButton.classList.add("btn", "btn-primary", "add-to-category");
+    addButton.dataset.category = category; // Lưu trữ loại sản phẩm trong thuộc tính dataset
+    addButton.id = "add-to-category";
+    buttonCell.appendChild(addButton);
+    row.appendChild(buttonCell);
+
+    // Thêm hàng vào tbody
+    tbodyA.appendChild(row);
+});
+
+// Xử lý sự kiện khi nhấn nút "Thêm vào danh mục"
+document.querySelectorAll('.add-to-category').forEach(button => {
+    button.addEventListener('click', function() {
+        const category = this.dataset.category;
+        categoriess.innerText = category;
+        // renderCategory();
+        // Thực hiện các hành động khi nhấn nút ở đây, ví dụ: thêm sản phẩm vào danh mục
+        console.log("Đã nhấn nút 'Thêm vào danh mục' cho loại sản phẩm:", category);
+    });
+});
+// function renderCategory(){
+//     let contents = '';
+//     categories.forEach(category => {
+//         contents += `
+//         <select class="form-control" id="category">
+//         <option value="0">${category}</option>
+//         <option value="1">${category}</option>
+//         <option value="2">${category}</option>
+//     </select>`;
+//     })
+//     tbodyA.innerHTML = contents;
+// }
+
+
 
 // ========================================= ORDER MANAGER ===========================================
-
-
 let order_tbody = document.getElementById('order_tbody');
 function renderOrder() {
     let contents = '';
@@ -443,6 +552,10 @@ function renderCustomerOrderInfor(order) {
     renderCustomerProductInfo(order);
 }
 
+
+
+
+
 function renderCustomerProductInfo(order) {
     let customer_product = document.getElementById('customer-product');
     let total_order = document.getElementById('total-order');
@@ -491,5 +604,4 @@ function actUpdateOrderStatus() {
     })
 
 }
-
 
