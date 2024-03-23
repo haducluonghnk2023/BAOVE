@@ -73,37 +73,47 @@ let image = document.getElementById("image");
 // Element Define
 let tbody = document.getElementById('tbody');
 window.onload = loadProductManager(PRODUCTS);
+
 function loadProductManager(PRODUCTS) {
-    PRODUCTS.forEach(product => {
-        renderProduct(product);
+    PRODUCTS.forEach((product,index) => {
+        renderProduct(product,index);
     });
 }
-//  Default Page
-function renderProduct(product) {
-    let contents = `
-        <tr>
-           
-            <th scope="row">${product.code}</th>
-            <td>
-                <img width="120" height="80" src="images/${product.image}">
-            </td>
-            <td>${product.productName}</td>
-            <td>${product.idcategory === "0" ? "Giày Nam" : product.idcategory === "1" ? "Giày Nữ" : "Phụ Kiện"}</td>
-            <td>${formatter.format(product.price)}</td>
-            <td>${product.material}</td>
-            <td>${product.amount}</td>
-            <td>${product.entry}</td>
-            <td class="text-center">
-                <i class="fas fa-trash-alt text-danger" data-code="${product.code}" id="delete"></i>
-                <i class="fas fa-edit text-info" data-code="${product.code}" id="edit"></i>
-                <i class="fas fa-info-circle text-success" data-code="${product.code}" id="detail" data-toggle="modal" data-target="#productModal"></i>
-            </td>
-    </tr>`;
 
-    tbody.innerHTML += contents;
+// Hàm để hiển thị sản phẩm và cập nhật số thứ tự
+function renderProduct(product, index) {
+    let newRow = tbody.insertRow();
+
+    // Chèn ô vào hàng mới
+    let cellIndex = newRow.insertCell(0); // Chèn ô số thứ tự ở đầu tiên
+    let cellCode = newRow.insertCell(1);
+    let cellImage = newRow.insertCell(2);
+    let cellName = newRow.insertCell(3);
+    let cellCategory = newRow.insertCell(4);
+    let cellPrice = newRow.insertCell(5);
+    let cellMaterial = newRow.insertCell(6);
+    let cellAmount = newRow.insertCell(7);
+    let cellEntry = newRow.insertCell(8);
+    let cellActions = newRow.insertCell(9);
+
+    // Đặt nội dung cho mỗi ô
+    cellIndex.textContent = index + 1; // Đặt số thứ tự của sản phẩm
+    cellCode.textContent = product.code;
+    cellImage.innerHTML = `<img width="120" height="80" src="images/${product.image}">`;
+    cellName.textContent = product.productName;
+    cellCategory.textContent = product.idcategory === "0" ? "Giày Nam" : product.idcategory === "1" ? "Giày Nữ" : "Phụ Kiện";
+    cellPrice.textContent = formatter.format(product.price);
+    cellMaterial.textContent = product.material;
+    cellAmount.textContent = product.amount;
+    cellEntry.textContent = product.entry;
+    cellActions.innerHTML = `
+    <td class="text-center">
+            <i class="fas fa-trash-alt text-danger" data-code="${product.code}" id="delete"></i>
+            <i class="fas fa-edit text-info" data-code="${product.code}" id="edit"></i>
+            <i class="fas fa-info-circle text-success" data-code="${product.code}" id="detail" data-toggle="modal" data-target="#productModal"></i>
+    </td>
+`;
 }
-
-
 
 // Thêm mới sản phẩm
 let add_new = document.getElementById('add_new');
@@ -125,7 +135,7 @@ function actAddProduct() {
     if ((validateForm(product) === true) && (checkExistProductCode(product.code) === false)) {
         PRODUCTS.push(product);
         localStorage.setItem('DATABASE', JSON.stringify(DATABASE));
-        renderProduct(product);
+        renderProduct(product,PRODUCTS.length - 1);
         notificationAction("Thêm Sản Phẩm Thành Công.", "#12e64b");
 
         //Xóa dữ liệu đầu vào
@@ -182,7 +192,6 @@ function checkExistProductCode(code) {
     }
 
 }
-
 
 // Hiển thi thông báo
 let notifi = document.getElementById('notifi');
@@ -242,11 +251,24 @@ function actProduct(event) {
     }
     // Delete
     if (ev.matches('#delete')) {
+        // Xóa sản phẩm khỏi mảng PRODUCTS
         PRODUCTS = PRODUCTS.filter(product => product.code !== data_code);
+        // Cập nhật lại localStorage
         DATABASE.PRODUCTS = PRODUCTS;
         localStorage.setItem('DATABASE', JSON.stringify(DATABASE));
+        // Xóa hàng trong bảng
         ev.closest('tr').remove();
+        // Cập nhật lại STT cho các sản phẩm còn lại
+        updateProductIndex();
         notificationAction("Xóa Sản Phẩm Thành Công.", "#38e867");
+    }
+}
+function updateProductIndex() {
+    let rows = tbody.getElementsByTagName('tr');
+    for (let i = 0; i < rows.length; i++) {
+        let cells = rows[i].getElementsByTagName('td');
+        // STT sẽ được cập nhật lại từ 1
+        cells[0].textContent = i + 1;
     }
 }
 
@@ -364,14 +386,17 @@ function renderAccount() {
 
 // ========================================= ORDER MANAGER ===========================================
 let order_tbody = document.getElementById('order_tbody');
+
 function renderOrder() {
     let contents = '';
+    let orderIndex = 0; // Biến đếm số thứ tự
     ORDERS.forEach(order => {
+        orderIndex++; // Tăng biến đếm số thứ tự lên mỗi lần lặp
         let options = '';
         if (order.status === "Đặt Hàng") {
             options = `
                 <option value="Đặt hàng" selected>Đặt hàng</option>
-                <option value="Giao hàng thành công" >Giao hàng thành công</option>`
+                <option value="Giao hàng thành công">Giao hàng thành công</option>`
         } else {
             options = `
                 <option value="Đặt Hàng">Đặt Hàng</option>
@@ -379,6 +404,7 @@ function renderOrder() {
         }
         contents += `
             <tr>
+                <th scope="row">${orderIndex}</th> <!-- Hiển thị số thứ tự -->
                 <th scope="row">${order.orderId}</th>
                 <th scope="row">${order.userID}</th>
                 <td>${order.createDate}</td>
@@ -398,6 +424,10 @@ function renderOrder() {
     actOrderDetail();
     actUpdateOrderStatus();
 }
+
+// Gọi hàm renderOrder để hiển thị danh sách đơn hàng khi trang được tải
+renderOrder();
+
 
 function actOrderDetail() {
     let order_detail = document.querySelectorAll('#order-detail');
@@ -502,5 +532,46 @@ function actUpdateOrderStatus() {
         });
     })
 
+}
+
+// Biến toàn cục để lưu trữ số thứ tự hiện tại của khách hàng
+
+
+// Hàm để render dữ liệu của khách hàng và cập nhật số thứ tự
+function renderAccount() {
+    let contents = '';
+    ACCOUNTS.forEach((account,index) => {
+        const customerIndex = index + 1; // Tăng số thứ tự lên 1 cho mỗi khách hàng
+        contents += `
+            <tr>
+                <th scope="row">${customerIndex}</th>
+                <td>${account.ID}</td>
+                <td>${account.username}</td>
+                <td>${account.phoneNumber}</td>
+                <td>${account.address}</td>
+                <td>${account.email}</td>
+                <td>${account.role}</td>
+                <td>
+                <button class="btn btn-primary" onclick="lockUnlockAccount('${account.ID}')">${account.status === 'Active' ? 'Mở Khóa' : ' khóa'}</button>
+            </td>
+            </tr>`;
+    });
+    user_tbody.innerHTML = contents;
+}
+
+// Gọi hàm renderAccount() khi trang được tải
+window.onload = function() {
+    renderAccount(); // Render dữ liệu của khách hàng
+};
+
+// Hàm xử lý sự kiện khi nhấn nút "Khóa" hoặc "Mở khóa"
+function lockUnlockAccount(accountID, index) {
+    let account = ACCOUNTS.find(account => account.ID === accountID);
+    if (account) {
+        account.status = account.status === 'Active' ? 'Locked' : 'Active';
+        // Cập nhật trạng thái của tài khoản trong localStorage
+        localStorage.setItem('ACCOUNTS', JSON.stringify(ACCOUNTS));
+        renderAccount();
+    }
 }
 

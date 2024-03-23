@@ -653,7 +653,6 @@ function validateForm() {
         }
     })
 
-    // Stupid again :))
     if (check > 0) {
         order_btn.disabled = true;
         return false;
