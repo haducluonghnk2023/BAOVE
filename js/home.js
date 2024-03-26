@@ -7,9 +7,11 @@ const formatter = new Intl.NumberFormat('it-IT', {
 })
 
 // Auto Generate ID
+// Hàm để tạo UUID v4
 function generateUUIDV4() {
-    return 'xxx-xxy'.replace(/[xy]/g, function (c) {
-        let r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        var r = Math.random() * 16 | 0,
+            v = c == 'x' ? r : (r & 0x3 | 0x8);
         return v.toString(16);
     });
 }
@@ -18,23 +20,23 @@ function generateUUIDV4() {
 let DATABASE = localStorage.getItem('DATABASE') ? JSON.parse(localStorage.getItem('DATABASE')) : {
     PRODUCTS: [],
     ACCOUNTS: [
-        // Set User Default role ADMIN
+        // Đặt vai trò mặc định của người dùng là ADMIN
         {
             ID: generateUUIDV4(),
             username: "Hạ Đức Lương",
-            phoneNumber: "00000000000000",
+            phoneNumber: "00000000000",
             address: "Phú Thọ",
             email: "admin@gmail.com",
             password: "123",
             role: "Admin"
         }
     ],
-    ORDERS: []
+    ORDERS: [],
 };
 
 localStorage.setItem('DATABASE', JSON.stringify(DATABASE));
 
-// Get table to use
+// Lấy các bảng để sử dụng
 let PRODUCTS = DATABASE.PRODUCTS;
 let ACCOUNTS = DATABASE.ACCOUNTS;
 let ORDERS = DATABASE.ORDERS;
@@ -151,6 +153,14 @@ function addNewAccount() {
     }
     register_btn.disabled = false;
 }
+function validateEmail(email) {
+    return String(email)
+    .toLowerCase()
+    .match(
+        /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+    );
+};
+
 
 function validateFormRegister() {
     let register_input = regiseter_form_area.querySelectorAll('input');
@@ -159,13 +169,12 @@ function validateFormRegister() {
     register_input.forEach(input => {
         if (input.value === '') {
             input.style.border = "1px solid red";
-            check++;
+            check++;// Tăng giá trị của biến check nếu có trường trống
         } else {
             input.style.border = "1px solid #ced4da";
         }
     });
 
-    // Stupid again :))
     if (check > 0) {
         register_btn.disabled = true;
         return false;
@@ -173,6 +182,7 @@ function validateFormRegister() {
         return true;
     }
 }
+
 
 // ********************** SIGNIN ACCOUNT **********************
 let email_login = document.getElementById('email-login');
@@ -404,25 +414,54 @@ function renderAllProduct(product) {
 }
 
 // **********************  FILTER PRODUCT **********************
+// let filter_option = document.getElementById('filter-option');
+// filter_option.addEventListener('change', filterProduct);
+
+// function filterProduct() {
+//     let option = filter_option.value;
+//     if (option === 'priceUp') {
+//         PRODUCTS.sort(function (p1, p2) {
+//             return p1.price - p2.price;
+//         })
+//         all_product.innerHTML = '';
+//         PRODUCTS.forEach(product => renderAllProduct(product));
+//     }
+//     if (option === 'priceDown') {
+//         PRODUCTS.sort(function (p1, p2) {
+//             return p2.price - p1.price;
+//         })
+//         all_product.innerHTML = '';
+//         PRODUCTS.forEach(product => renderAllProduct(product));
+//     }
+// }
+
 let filter_option = document.getElementById('filter-option');
 filter_option.addEventListener('change', filterProduct);
 
 function filterProduct() {
     let option = filter_option.value;
-    if (option === 'priceUp') {
-        PRODUCTS.sort(function (p1, p2) {
-            return p1.price - p2.price;
-        })
-        all_product.innerHTML = '';
-        PRODUCTS.forEach(product => renderAllProduct(product));
+    if (option === 'priceUp' || option === 'priceDown') {
+        // Sắp xếp mảng PRODUCTS
+        if (option === 'priceUp') {
+            PRODUCTS.sort((p1, p2) => p1.price - p2.price);
+        } else if (option === 'priceDown') {
+            PRODUCTS.sort((p1, p2) => p2.price - p1.price);
+        }
+
+        // Cập nhật giao diện
+        updateProductDisplay();
     }
-    if (option === 'priceDown') {
-        PRODUCTS.sort(function (p1, p2) {
-            return p2.price - p1.price;
-        })
-        all_product.innerHTML = '';
-        PRODUCTS.forEach(product => renderAllProduct(product));
-    }
+}
+
+function updateProductDisplay() {
+    // Lấy phần tử cha của tất cả sản phẩm
+    let parentElement = document.getElementById('all_product');
+
+    // Xóa tất cả các sản phẩm hiện có trong giao diện
+    parentElement.innerHTML = '';
+
+    // Render lại các sản phẩm đã được sắp xếp
+    PRODUCTS.forEach(product => renderAllProduct(product));
 }
 
 // ****************** Search ********************************
@@ -660,3 +699,9 @@ function validateForm() {
         return true;
     }
 }
+
+
+
+
+
+

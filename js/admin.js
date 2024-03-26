@@ -7,9 +7,11 @@ const formatter = new Intl.NumberFormat('it-IT', {
 })
 
 // Auto Generate ID
+// Hàm để tạo UUID v4
 function generateUUIDV4() {
-    return 'xxx-xxy'.replace(/[xy]/g, function (c) {
-        let r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        var r = Math.random() * 16 | 0,
+            v = c == 'x' ? r : (r & 0x3 | 0x8);
         return v.toString(16);
     });
 }
@@ -18,7 +20,7 @@ function generateUUIDV4() {
 let DATABASE = localStorage.getItem('DATABASE') ? JSON.parse(localStorage.getItem('DATABASE')) : {
     PRODUCTS: [],
     ACCOUNTS: [
-        // Set User Default role ADMIN
+        // Đặt vai trò mặc định của người dùng là ADMIN
         {
             ID: generateUUIDV4(),
             username: "Hạ Đức Lương",
@@ -27,18 +29,33 @@ let DATABASE = localStorage.getItem('DATABASE') ? JSON.parse(localStorage.getIte
             email: "admin@gmail.com",
             password: "123",
             role: "Admin"
-            
         }
     ],
-    ORDERS: []
+    ORDERS: [],
+    
 };
 
 localStorage.setItem('DATABASE', JSON.stringify(DATABASE));
-
-// Get table to use
+// Lấy các bảng để sử dụng
 let PRODUCTS = DATABASE.PRODUCTS;
 let ACCOUNTS = DATABASE.ACCOUNTS;
 let ORDERS = DATABASE.ORDERS;
+
+// let CATEGORIES = localStorage.getItem('CATEGORIES') ? JSON.parse(localStorage.getItem('CATEGORIES')) : { 7
+//     CATEGORIES: [
+//         {
+//             ID: generateUUIDV4(),
+//             category: "Giày"
+//         },
+//         {
+//             ID: generateUUIDV4(),
+//             category: "Phụ kiện"
+//         },
+//     ]
+// }
+
+// localStorage.setItem('CATEGORIES', JSON.stringify(CATEGORIES));
+
 
 // ********************************* Generate DATA ********************************
 
@@ -47,12 +64,96 @@ generate.addEventListener('click', generateData);
 
 function generateData() {
     // read json file
-    $.getJSON("js/data.json", function (data) {
+    $.getJSON("./js/data.json", function (data) {
         DATABASE.PRODUCTS = data.PRODUCTS;
         localStorage.setItem('DATABASE', JSON.stringify(DATABASE));
         location.reload();
     });
 }
+// Lấy reference của button và dropdown select
+let addButton = document.getElementById('btnn');
+let selectDropdown = document.getElementById('category');
+let inputField = document.getElementById('ab');
+
+document.addEventListener('DOMContentLoaded', function() {
+    loadCategoriesFromLocalStorage();
+});
+
+// Sự kiện click cho nút "Thêm"
+addButton.addEventListener('click', function() {
+    console.log(888);
+    // đặt lại chỗ hàm render
+    // renderCategoriesToTable();
+        // Lấy giá trị từ ô input
+        let inputValue = inputField.value.trim();
+        if (inputValue === '') {
+            alert("Danh mục không hợp lệ! Vui lòng nhập giá trị.");
+            return; // Dừng lại nếu giá trị trống
+        }
+        // Kiểm tra xem giá trị đã tồn tại trong dropdown chưa
+        let optionExists = Array.from(selectDropdown.options).some(option => option.text === inputValue);
+
+        // Nếu giá trị không tồn tại trong dropdown, thêm mới
+        if (!optionExists) {
+            let id = generateUUIDV4();
+            let newOption = new Option(inputValue, inputValue);
+            selectDropdown.add(newOption);
+            inputField.value = ''; // Làm trống ô input sau khi thêm
+            // Lưu giá trị vào Local Storage
+            saveCategoryToLocalStorage(id,inputValue);
+             // Hiển thị Snackbar
+            showSnackbar("Đã thêm thành công!");
+        } else {
+            alert("Danh mục đã tồn tại!");
+        }
+        renderCategoriesToTable();
+});
+
+// Hàm render danh sách danh mục từ Local Storage
+function renderCategoriesFromLocalStorage() {
+    let selectDropdown = document.getElementById('category');
+    // selectDropdown.innerHTML = ''; // Xóa tất cả các option hiện có trong dropdown
+    
+    let categories = JSON.parse(localStorage.getItem('categories')) || [];
+
+    // Tạo các option cho dropdown từ danh sách danh mục trong Local Storage
+    categories.forEach(function(category) {
+        let option = document.createElement('option');
+        option.value = category.ID; // Sét giá trị của option là ID của danh mục
+        option.textContent = category.category; // Sét nội dung của option là tên danh mục
+        selectDropdown.appendChild(option); // Thêm option vào dropdown
+    });
+}
+
+// Gọi hàm render khi trang được tải
+// document.addEventListener('DOMContentLoaded', function() {
+//     renderCategoriesFromLocalStorage();
+// });
+
+// Hàm lưu giá trị vào Local Storage
+
+function saveCategoryToLocalStorage(id,category) {
+    let categories = JSON.parse(localStorage.getItem('categories')) || [];
+    categories.push({ID:id,name:category});
+    localStorage.setItem('categories', JSON.stringify(categories));
+}
+// Hàm load danh sách danh mục từ Local Storage
+function loadCategoriesFromLocalStorage() {
+    selectDropdown.innerHTML = '';
+    let categories = JSON.parse(localStorage.getItem('categories')) || [];
+    for (let category of categories) {
+        let newOption = new Option(category.name);
+        selectDropdown.add(newOption);
+    }
+}
+// Hàm hiển thị Snackbar
+function showSnackbar(message) {
+    let snackbar = document.getElementById('snackbar');
+    snackbar.textContent = message;
+    snackbar.className = "show"; // Hiển thị Snackbar
+    setTimeout(function(){ snackbar.className = snackbar.className.replace("show", ""); }, 3000); // Ẩn Snackbar sau 3 giây
+}
+
 
 
 // ========================================= PRODUCT MANAGER ===========================================
@@ -75,6 +176,7 @@ let tbody = document.getElementById('tbody');
 window.onload = loadProductManager(PRODUCTS);
 
 function loadProductManager(PRODUCTS) {
+    tbody.innerHTML = ''
     PRODUCTS.forEach((product,index) => {
         renderProduct(product,index);
     });
@@ -82,38 +184,31 @@ function loadProductManager(PRODUCTS) {
 
 // Hàm để hiển thị sản phẩm và cập nhật số thứ tự
 function renderProduct(product, index) {
-    let newRow = tbody.insertRow();
+    console.log(product);
+    // Tạo một chuỗi HTML để chèn vào tbody
+    let newRow = `
+        <tr>
+            <td>${index + 1}</td>
+            <td>${product.code}</td>    
+            <td><img width="120" height="80" src="images/${product.image}"></td>
+            <td>${product.productName}</td>
+            <td>${product.idcategory === "0" ? "Giày Nam" : product.idcategory === "1" ? "Giày Nữ" : "Phụ Kiện"}</td>
+            <td>${formatter.format(product.price)}</td>
+            <td>${product.material}</td>
+            <td>${product.amount}</td>
+            <td>${product.entry}</td>
+            <td class="text-center">
+                <i class="fas fa-trash-alt text-danger" data-code="${product.code}" id="delete"></i>
+                <i class="fas fa-edit text-info" data-code="${product.code}" id="edit"></i>
+                <i class="fas fa-info-circle text-success" data-code="${product.code}" id="detail" data-toggle="modal" data-target="#productModal"></i>
+            </td>
+        </tr>
+    `;
 
-    // Chèn ô vào hàng mới
-    let cellIndex = newRow.insertCell(0); // Chèn ô số thứ tự ở đầu tiên
-    let cellCode = newRow.insertCell(1);
-    let cellImage = newRow.insertCell(2);
-    let cellName = newRow.insertCell(3);
-    let cellCategory = newRow.insertCell(4);
-    let cellPrice = newRow.insertCell(5);
-    let cellMaterial = newRow.insertCell(6);
-    let cellAmount = newRow.insertCell(7);
-    let cellEntry = newRow.insertCell(8);
-    let cellActions = newRow.insertCell(9);
-
-    // Đặt nội dung cho mỗi ô
-    cellIndex.textContent = index + 1; // Đặt số thứ tự của sản phẩm
-    cellCode.textContent = product.code;
-    cellImage.innerHTML = `<img width="120" height="80" src="images/${product.image}">`;
-    cellName.textContent = product.productName;
-    cellCategory.textContent = product.idcategory === "0" ? "Giày Nam" : product.idcategory === "1" ? "Giày Nữ" : "Phụ Kiện";
-    cellPrice.textContent = formatter.format(product.price);
-    cellMaterial.textContent = product.material;
-    cellAmount.textContent = product.amount;
-    cellEntry.textContent = product.entry;
-    cellActions.innerHTML = `
-    <td class="text-center">
-            <i class="fas fa-trash-alt text-danger" data-code="${product.code}" id="delete"></i>
-            <i class="fas fa-edit text-info" data-code="${product.code}" id="edit"></i>
-            <i class="fas fa-info-circle text-success" data-code="${product.code}" id="detail" data-toggle="modal" data-target="#productModal"></i>
-    </td>
-`;
+    // Chèn chuỗi HTML vào tbody
+    tbody.innerHTML += newRow;
 }
+
 
 // Thêm mới sản phẩm
 let add_new = document.getElementById('add_new');
@@ -251,17 +346,23 @@ function actProduct(event) {
     }
     // Delete
     if (ev.matches('#delete')) {
-        // Xóa sản phẩm khỏi mảng PRODUCTS
-        PRODUCTS = PRODUCTS.filter(product => product.code !== data_code);
-        // Cập nhật lại localStorage
-        DATABASE.PRODUCTS = PRODUCTS;
-        localStorage.setItem('DATABASE', JSON.stringify(DATABASE));
-        // Xóa hàng trong bảng
-        ev.closest('tr').remove();
-        // Cập nhật lại STT cho các sản phẩm còn lại
-        updateProductIndex();
-        notificationAction("Xóa Sản Phẩm Thành Công.", "#38e867");
+        // Hiển thị hộp thoại xác nhận
+        let confirmDelete = confirm("Bạn có chắc chắn muốn xóa sản phẩm này không?");
+        // Kiểm tra xem người dùng đã xác nhận xóa hay không
+        if (confirmDelete) {
+            // Xóa sản phẩm khỏi mảng PRODUCTS
+            PRODUCTS = PRODUCTS.filter(product => product.code !== data_code);
+            // Cập nhật lại localStorage
+            DATABASE.PRODUCTS = PRODUCTS;
+            localStorage.setItem('DATABASE', JSON.stringify(DATABASE));
+            // Xóa hàng trong bảng
+            ev.closest('tr').remove();
+            // Cập nhật lại STT cho các sản phẩm còn lại
+            updateProductIndex();
+            notificationAction("Xóa Sản Phẩm Thành Công.", "#38e867");
+        }
     }
+
 }
 function updateProductIndex() {
     let rows = tbody.getElementsByTagName('tr');
@@ -329,25 +430,30 @@ let user_manager = document.getElementById('user-manager');
 let order_manager = document.getElementById('order-manager');
 let category_manager = document.getElementById('category-manager');
 
-let categoriess = document.getElementById('category');
 
 s_product.addEventListener('click', showProductManager);
 s_user.addEventListener('click', showUserManager);
 s_order.addEventListener('click', showOrderManager);
+s_category.addEventListener('click', showCategoryManager);
+
+// document.addEventListener('DOMContentLoaded', function() {
+//     // Hiển thị trang quản lý danh mục khi trang được tải lần đầu
+//     showCategoryManager();
+// });
 
 function showProductManager() {
     product_manager.style.display = 'block';
     user_manager.style.display = 'none';
     order_manager.style.display = 'none';
-   
-
+    category_manager.style.display = 'none';
+    loadProductManager(PRODUCTS);
 }
 
 function showUserManager() {
-    product_manager.style.display = 'none';
     user_manager.style.display = 'block';
+    product_manager.style.display = 'none';
     order_manager.style.display = 'none';
-  
+    category_manager.style.display = 'none';
     renderAccount();
 }
 
@@ -355,14 +461,18 @@ function showOrderManager() {
     product_manager.style.display = 'none';
     user_manager.style.display = 'none';
     order_manager.style.display = 'block';
-    
+    category_manager.style.display = 'none';
     renderOrder();
 }
-
-
+function showCategoryManager(){
+    product_manager.style.display = 'none';
+    user_manager.style.display = 'none';
+    order_manager.style.display = 'none';
+    category_manager.style.display = 'block';
+    //  renderCategoriesToTable();
+}
 
 // ========================================= OPEN TAB MANAGER ===========================================
-
 
 let user_tbody = document.getElementById('user_tbody');
 function renderAccount() {
@@ -382,7 +492,30 @@ function renderAccount() {
     user_tbody.innerHTML = contents;
 }
 
+// ==========================================CATEGORY ==============================
+function renderCategoriesToTable() {
+    // Lấy reference của tbody
+    let categories = JSON.parse(localStorage.getItem('categories')) || [];
+    let html="";
+    let count=1;
+    for (let i = 0; i < categories.length; i++) {
+      html +=
+                `
+                <tr>
+                    <th scope="col">${count++}</th>
+                    <th scope="col">${categories[i].ID}</th>
+                    <th scope="col">${categories[i].name}</th>
+                </tr>
+                `
+        
+    }
+    document.getElementById("category_tbody").innerHTML=html
+    
+}
+renderCategoriesToTable()
 
+// Sử dụng hàm này sau khi có dữ liệu categories
+// renderCategoriesToTable(categories);
 
 // ========================================= ORDER MANAGER ===========================================
 let order_tbody = document.getElementById('order_tbody');
@@ -481,10 +614,6 @@ function renderCustomerOrderInfor(order) {
     renderCustomerProductInfo(order);
 }
 
-
-
-
-
 function renderCustomerProductInfo(order) {
     let customer_product = document.getElementById('customer-product');
     let total_order = document.getElementById('total-order');
@@ -534,9 +663,6 @@ function actUpdateOrderStatus() {
 
 }
 
-// Biến toàn cục để lưu trữ số thứ tự hiện tại của khách hàng
-
-
 // Hàm để render dữ liệu của khách hàng và cập nhật số thứ tự
 function renderAccount() {
     let contents = '';
@@ -554,7 +680,8 @@ function renderAccount() {
                 <td>
                 <button class="btn btn-primary" onclick="lockUnlockAccount('${account.ID}')">${account.status === 'Active' ? 'Mở Khóa' : ' khóa'}</button>
             </td>
-            </tr>`;
+            </tr>
+            `;
     });
     user_tbody.innerHTML = contents;
 }
@@ -565,13 +692,12 @@ window.onload = function() {
 };
 
 // Hàm xử lý sự kiện khi nhấn nút "Khóa" hoặc "Mở khóa"
-function lockUnlockAccount(accountID, index) {
+function lockUnlockAccount(accountID) {
     let account = ACCOUNTS.find(account => account.ID === accountID);
     if (account) {
-        account.status = account.status === 'Active' ? 'Locked' : 'Active';
+        account.status = account.status === 'true' ? 'false' : 'true';
         // Cập nhật trạng thái của tài khoản trong localStorage
         localStorage.setItem('ACCOUNTS', JSON.stringify(ACCOUNTS));
         renderAccount();
     }
 }
-
