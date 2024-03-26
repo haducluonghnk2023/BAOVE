@@ -18,7 +18,6 @@ function generateUUIDV4() {
 
 // ==================== DATABASE ==========================
 let DATABASE = localStorage.getItem('DATABASE') ? JSON.parse(localStorage.getItem('DATABASE')) : {
-    PRODUCTS: [],
     ACCOUNTS: [
         // Đặt vai trò mặc định của người dùng là ADMIN
         {
@@ -31,45 +30,38 @@ let DATABASE = localStorage.getItem('DATABASE') ? JSON.parse(localStorage.getIte
             role: "Admin"
         }
     ],
-    ORDERS: [],
+    ORDERS: JSON.parse(localStorage.getItem("ORDERS")) || [],
+    PRODUCTS: JSON.parse(localStorage.getItem("PRODUCTS")) || [],
     
 };
+let {PRODUCTS, ACCOUNTS, ORDERS } = DATABASE;
+localStorage.setItem('PRODUCTS', JSON.stringify(PRODUCTS));
+localStorage.setItem('ACCOUNTS', JSON.stringify(ACCOUNTS));
+localStorage.setItem('ORDERS', JSON.stringify(ORDERS));
 
-localStorage.setItem('DATABASE', JSON.stringify(DATABASE));
+
+// localStorage.setItem('DATABASE', JSON.stringify(DATABASE));
 // Lấy các bảng để sử dụng
-let PRODUCTS = DATABASE.PRODUCTS;
-let ACCOUNTS = DATABASE.ACCOUNTS;
-let ORDERS = DATABASE.ORDERS;
-
-// let CATEGORIES = localStorage.getItem('CATEGORIES') ? JSON.parse(localStorage.getItem('CATEGORIES')) : { 7
-//     CATEGORIES: [
-//         {
-//             ID: generateUUIDV4(),
-//             category: "Giày"
-//         },
-//         {
-//             ID: generateUUIDV4(),
-//             category: "Phụ kiện"
-//         },
-//     ]
-// }
-
-// localStorage.setItem('CATEGORIES', JSON.stringify(CATEGORIES));
+// let PRODUCTS = DATABASE.PRODUCTS;
+// let ACCOUNTS = DATABASE.ACCOUNTS;
+// let ORDERS = DATABASE.ORDERS;
 
 
 // ********************************* Generate DATA ********************************
 
-let generate = document.getElementById('generate');
-generate.addEventListener('click', generateData);
+// let generate = document.getElementById('generate');
+// generate.addEventListener('click', generateData);
 
-function generateData() {
-    // read json file
-    $.getJSON("./js/data.json", function (data) {
-        DATABASE.PRODUCTS = data.PRODUCTS;
-        localStorage.setItem('DATABASE', JSON.stringify(DATABASE));
-        location.reload();
-    });
-}
+// function generateData() {
+//     // read json file
+//     $.getJSON("./js/data.json", function (data) {
+//         DATABASE.PRODUCTS = data.PRODUCTS;
+//         localStorage.setItem('DATABASE', JSON.stringify(DATABASE));
+//         location.reload();
+//     });
+// }
+
+
 // Lấy reference của button và dropdown select
 let addButton = document.getElementById('btnn');
 let selectDropdown = document.getElementById('category');
@@ -114,10 +106,10 @@ function renderCategoriesFromLocalStorage() {
     let selectDropdown = document.getElementById('category');
     // selectDropdown.innerHTML = ''; // Xóa tất cả các option hiện có trong dropdown
     
-    let categories = JSON.parse(localStorage.getItem('categories')) || [];
+    let CATEGORIES = JSON.parse(localStorage.getItem('CATEGORIES')) || [];
 
     // Tạo các option cho dropdown từ danh sách danh mục trong Local Storage
-    categories.forEach(function(category) {
+    CATEGORIES.forEach(function(category) {
         let option = document.createElement('option');
         option.value = category.ID; // Sét giá trị của option là ID của danh mục
         option.textContent = category.category; // Sét nội dung của option là tên danh mục
@@ -133,15 +125,15 @@ function renderCategoriesFromLocalStorage() {
 // Hàm lưu giá trị vào Local Storage
 
 function saveCategoryToLocalStorage(id,category) {
-    let categories = JSON.parse(localStorage.getItem('categories')) || [];
-    categories.push({ID:id,name:category});
-    localStorage.setItem('categories', JSON.stringify(categories));
+    let CATEGORIES = JSON.parse(localStorage.getItem('CATEGORIES')) || [];
+    CATEGORIES.push({ID:id,name:category});
+    localStorage.setItem('CATEGORIES', JSON.stringify(CATEGORIES));
 }
 // Hàm load danh sách danh mục từ Local Storage
 function loadCategoriesFromLocalStorage() {
     selectDropdown.innerHTML = '';
-    let categories = JSON.parse(localStorage.getItem('categories')) || [];
-    for (let category of categories) {
+    let CATEGORIES = JSON.parse(localStorage.getItem('CATEGORIES')) || [];
+    for (let category of CATEGORIES) {
         let newOption = new Option(category.name);
         selectDropdown.add(newOption);
     }
@@ -173,9 +165,9 @@ let image = document.getElementById("image");
 
 // Element Define
 let tbody = document.getElementById('tbody');
-window.onload = loadProductManager(PRODUCTS);
+window.onload = loadProductManager();
 
-function loadProductManager(PRODUCTS) {
+function loadProductManager() {
     tbody.innerHTML = ''
     PRODUCTS.forEach((product,index) => {
         renderProduct(product,index);
@@ -229,7 +221,7 @@ function actAddProduct() {
 
     if ((validateForm(product) === true) && (checkExistProductCode(product.code) === false)) {
         PRODUCTS.push(product);
-        localStorage.setItem('DATABASE', JSON.stringify(DATABASE));
+        localStorage.setItem('PRODUCTS', JSON.stringify(PRODUCTS));
         renderProduct(product,PRODUCTS.length - 1);
         notificationAction("Thêm Sản Phẩm Thành Công.", "#12e64b");
 
@@ -353,8 +345,7 @@ function actProduct(event) {
             // Xóa sản phẩm khỏi mảng PRODUCTS
             PRODUCTS = PRODUCTS.filter(product => product.code !== data_code);
             // Cập nhật lại localStorage
-            DATABASE.PRODUCTS = PRODUCTS;
-            localStorage.setItem('DATABASE', JSON.stringify(DATABASE));
+            localStorage.setItem('PRODUCTS', JSON.stringify(PRODUCTS));
             // Xóa hàng trong bảng
             ev.closest('tr').remove();
             // Cập nhật lại STT cho các sản phẩm còn lại
@@ -389,7 +380,7 @@ function actUpdate() {
             if (images !== '') {
                 product.image = images.slice(12, images.length);
             }
-            localStorage.setItem('DATABASE', JSON.stringify(DATABASE));
+            localStorage.setItem('PRODUCTS', JSON.stringify(PRODUCTS));
             location.reload();
             notificationAction("Cập Nhật Sản Phẩm Thành Công.", "#1216e6");
         }
@@ -492,16 +483,16 @@ function renderAccount() {
 // ==========================================CATEGORY ==============================
 function renderCategoriesToTable() {
     // Lấy reference của tbody
-    let categories = JSON.parse(localStorage.getItem('categories')) || [];
+    let CATEGORIES = JSON.parse(localStorage.getItem('CATEGORIES')) || [];
     let html="";
     let count=1;
-    for (let i = 0; i < categories.length; i++) {
+    for (let i = 0; i < CATEGORIES.length; i++) {
       html +=
                 `
                 <tr>
                     <th scope="col">${count++}</th>
-                    <th scope="col">${categories[i].ID}</th>
-                    <th scope="col">${categories[i].name}</th>
+                    <th scope="col">${CATEGORIES[i].ID}</th>
+                    <th scope="col">${CATEGORIES[i].name}</th>
                 </tr>
                 `
         
@@ -652,7 +643,7 @@ function actUpdateOrderStatus() {
             ORDERS.forEach(order => {
                 if (order.orderId === orderStatus.getAttribute('data-id')) {
                     order.status = orderStatus.value;
-                    localStorage.setItem('DATABASE', JSON.stringify(DATABASE));
+                    localStorage.setItem('ORDERS', JSON.stringify(ORDERS));
                 }
             })
         });

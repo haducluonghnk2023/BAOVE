@@ -18,31 +18,20 @@ function generateUUIDV4() {
 
 // ==================== DATABASE ==========================
 let DATABASE = localStorage.getItem('DATABASE') ? JSON.parse(localStorage.getItem('DATABASE')) : {
-    PRODUCTS: [],
-    ACCOUNTS: [
-        // Đặt vai trò mặc định của người dùng là ADMIN
-        {
-            ID: generateUUIDV4(),
-            username: "Hạ Đức Lương",
-            phoneNumber: "00000000000",
-            address: "Phú Thọ",
-            email: "admin@gmail.com",
-            password: "123",
-            role: "Admin"
-        }
-    ],
-    ORDERS: [],
+    ACCOUNTS:  JSON.parse(localStorage.getItem("ACCOUNTS")) || [],
+    ORDERS: JSON.parse(localStorage.getItem("ORDERS")) || [],
+    PRODUCTS: JSON.parse(localStorage.getItem("PRODUCTS")) || [],
 };
 
-localStorage.setItem('DATABASE', JSON.stringify(DATABASE));
+let {PRODUCTS, ACCOUNTS, ORDERS } = DATABASE;
+localStorage.setItem('PRODUCTS', JSON.stringify(PRODUCTS));
+localStorage.setItem('ACCOUNTS', JSON.stringify(ACCOUNTS));
+localStorage.setItem('ORDERS', JSON.stringify(ORDERS));
 
-// Lấy các bảng để sử dụng
-let PRODUCTS = DATABASE.PRODUCTS;
-let ACCOUNTS = DATABASE.ACCOUNTS;
-let ORDERS = DATABASE.ORDERS;
 
 // ==================== SESSION STORE ==========================
 let SESSION = sessionStorage.getItem('SESSION') ? JSON.parse(sessionStorage.getItem('SESSION')) : null;
+
 
 // ========================================= CART CLIENT ===========================================
 let btn_cart = document.getElementById('btn-cart');
@@ -147,7 +136,7 @@ function addNewAccount() {
     }
     if (validateFormRegister()) {
         ACCOUNTS.push(account);
-        localStorage.setItem('DATABASE', JSON.stringify(DATABASE));
+        localStorage.setItem('ACCOUNTS', JSON.stringify(ACCOUNTS));
         alert("Tạo Tài Khoản Thành Công !");
         showSignForm();
     }
@@ -257,7 +246,6 @@ logout.addEventListener('click', function () {
 
 function actProfileToggle() {
     SESSION = JSON.parse(sessionStorage.getItem('SESSION'));
-
     ACCOUNTS.forEach(function (account) {
         if (account.ID === SESSION.userID) {
             renderProfileDetail(account);
@@ -289,13 +277,12 @@ function renderProfileDetail(account) {
     // *** Update User Pr0fi|e ***
     let updateProfile = document.getElementById('updateProfile');
     updateProfile.addEventListener('click', updateUserProfile);
-
     function updateUserProfile() {
         account.username = p_name.value;
         account.phoneNumber = p_number.value;
         account.email = p_email.value;
         account.address = p_address.value;
-        localStorage.setItem('DATABASE', JSON.stringify(DATABASE));
+        localStorage.setItem('ACCOUNTS', JSON.stringify(ACCOUNTS));
         alert('Update Thành Công !');
     }
 }
@@ -350,9 +337,9 @@ let owl_slide = document.getElementById('owl-slide');
 let extra_product = document.getElementById('extra-product');
 let all_product = document.getElementById('all-product');
 
-window.onload = loadProduct(PRODUCTS);
+window.onload = loadProduct();
 
-function loadProduct(PRODUCTS) {
+function loadProduct() {
     PRODUCTS.forEach(product => {
         if (product.idcategory === "Phụ kiện") {
             renderExtraProduct(product);
@@ -668,7 +655,7 @@ function actOrder() {
 
     if (validateForm()) {
         ORDERS.push(order);
-        localStorage.setItem('DATABASE', JSON.stringify(DATABASE));
+        localStorage.setItem('ORDERS', JSON.stringify(ORDERS));
         alert('Đặt hàng thành công !');
         SESSION.products = [];
         sessionStorage.setItem('SESSION', JSON.stringify(SESSION));
@@ -731,6 +718,13 @@ function isLoggedIn(accountID) {
     return !!accountID;
 }
 
+function checkLocal(){
+    if(ACCOUNTS.status === "true"){
+        addToCart();
+    }else {
+        notificationAction("tài khoản bạn đã bị khóa , không thể mua hàng");
+    }
+}
 
 
 
