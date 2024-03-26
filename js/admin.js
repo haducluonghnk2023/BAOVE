@@ -184,7 +184,7 @@ function loadProductManager(PRODUCTS) {
 
 // Hàm để hiển thị sản phẩm và cập nhật số thứ tự
 function renderProduct(product, index) {
-    console.log(product);
+    // console.log(product);
     // Tạo một chuỗi HTML để chèn vào tbody
     let newRow = `
         <tr>
@@ -399,7 +399,6 @@ function actUpdate() {
 // Search
 let search = document.getElementById("search");
 search.addEventListener('input', actSearch);
-
 function actSearch() {
     let searchInput = search.value;
     let productCompare = PRODUCTS.filter(product => searchCompare(searchInput, product.productName));
@@ -408,14 +407,12 @@ function actSearch() {
         renderProduct(product);
     });
 }
-
 // Search Compare
 function searchCompare(searchInput, productName) {
     let searchInputLower = searchInput.toLowerCase();
     let productNameLower = productName.toLowerCase();
     return productNameLower.includes(searchInputLower);
 }
-
 
 // ========================================= ACCOUNT MANAGER ===========================================
 
@@ -685,12 +682,10 @@ function renderAccount() {
     });
     user_tbody.innerHTML = contents;
 }
-
 // Gọi hàm renderAccount() khi trang được tải
 window.onload = function() {
     renderAccount(); // Render dữ liệu của khách hàng
 };
-
 // Hàm xử lý sự kiện khi nhấn nút "Khóa" hoặc "Mở khóa"
 function lockUnlockAccount(accountID) {
     let account = ACCOUNTS.find(account => account.ID === accountID);

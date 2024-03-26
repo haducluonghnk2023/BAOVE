@@ -354,7 +354,7 @@ window.onload = loadProduct(PRODUCTS);
 
 function loadProduct(PRODUCTS) {
     PRODUCTS.forEach(product => {
-        if (product.idcategory === "2") {
+        if (product.idcategory === "Phụ kiện") {
             renderExtraProduct(product);
         } else {
             renderProduct(product);
@@ -435,9 +435,9 @@ function renderAllProduct(product) {
 //     }
 // }
 
+
 let filter_option = document.getElementById('filter-option');
 filter_option.addEventListener('change', filterProduct);
-
 function filterProduct() {
     let option = filter_option.value;
     if (option === 'priceUp' || option === 'priceDown') {
@@ -447,7 +447,6 @@ function filterProduct() {
         } else if (option === 'priceDown') {
             PRODUCTS.sort((p1, p2) => p2.price - p1.price);
         }
-
         // Cập nhật giao diện
         updateProductDisplay();
     }
@@ -698,6 +697,38 @@ function validateForm() {
     } else {
         return true;
     }
+}
+
+function lockUnlockAccount(accountID) {
+    let account = ACCOUNTS.find(account => account.ID === accountID);
+    if (account) {
+        // Kiểm tra xem tài khoản đã đăng nhập chưa và trạng thái là false
+        if (account.status === 'false' && isLoggedIn(accountID)) {
+            // Thực hiện hành động khi tài khoản bị khóa và đã đăng nhập
+            alert("Tài khoản của bạn đã bị khóa và không thể mua hàng.");
+            return;
+        }
+
+        // Thay đổi trạng thái của tài khoản
+        account.status = account.status === 'true' ? 'false' : 'true';
+        
+        // Cập nhật trạng thái của tài khoản trong localStorage
+        localStorage.setItem('ACCOUNTS', JSON.stringify(ACCOUNTS));
+
+        renderAccount();
+    }
+}
+
+// Hàm kiểm tra xem người dùng đã đăng nhập hay chưa
+function isLoggedIn(accountID) {
+    // Ở đây, bạn có thể thực hiện kiểm tra bằng cách kiểm tra trạng thái đăng nhập từ một biến hoặc localStorage
+    // Ví dụ, nếu bạn lưu trạng thái đăng nhập của người dùng trong localStorage:
+    // let loggedInAccount = JSON.parse(localStorage.getItem('loggedInAccount'));
+    // return loggedInAccount && loggedInAccount.ID === accountID;
+
+    // Tạm thời, để minh họa, ta sẽ giả định rằng người dùng đã đăng nhập nếu có tài khoản ID
+    // Bạn cần điều chỉnh hàm này tương ứng với cách bạn xác định trạng thái đăng nhập của người dùng
+    return !!accountID;
 }
 
 
