@@ -18,8 +18,22 @@ function generateUUIDV4() {
 
 // ==================== DATABASE ==========================
 let DATABASE = localStorage.getItem('DATABASE') ? JSON.parse(localStorage.getItem('DATABASE')) : {
-    ACCOUNTS: [
-        // Đặt vai trò mặc định của người dùng là ADMIN
+    // ACCOUNTS: [
+    //     // Đặt vai trò mặc định của người dùng là ADMIN
+    //     {
+    //         ID: generateUUIDV4(),
+    //         username: "Hạ Đức Lương",
+    //         phoneNumber: "00000000000",
+    //         address: "Phú Thọ",
+    //         email: "admin@gmail.com",
+    //         password: "123",
+    //         role: "Admin"
+    //     }
+    // ],
+    ACCOUNTS:  JSON.parse(localStorage.getItem("ACCOUNTS")) || [],
+    ORDERS: JSON.parse(localStorage.getItem("ORDERS")) || [],
+    PRODUCTS: JSON.parse(localStorage.getItem("PRODUCTS")) || [],
+    ADMIN: [
         {
             ID: generateUUIDV4(),
             username: "Hạ Đức Lương",
@@ -29,15 +43,14 @@ let DATABASE = localStorage.getItem('DATABASE') ? JSON.parse(localStorage.getIte
             password: "123",
             role: "Admin"
         }
-    ],
-    ORDERS: JSON.parse(localStorage.getItem("ORDERS")) || [],
-    PRODUCTS: JSON.parse(localStorage.getItem("PRODUCTS")) || [],
+    ]
     
 };
-let {PRODUCTS, ACCOUNTS, ORDERS } = DATABASE;
+let {PRODUCTS, ACCOUNTS, ORDERS, ADMIN } = DATABASE;
 localStorage.setItem('PRODUCTS', JSON.stringify(PRODUCTS));
 localStorage.setItem('ACCOUNTS', JSON.stringify(ACCOUNTS));
 localStorage.setItem('ORDERS', JSON.stringify(ORDERS));
+localStorage.setItem('ADMIN',JSON.stringify(ADMIN));
 
 
 // localStorage.setItem('DATABASE', JSON.stringify(DATABASE));
@@ -117,6 +130,7 @@ function renderCategoriesFromLocalStorage() {
     });
 }
 
+
 // Gọi hàm render khi trang được tải
 // document.addEventListener('DOMContentLoaded', function() {
 //     renderCategoriesFromLocalStorage();
@@ -124,7 +138,7 @@ function renderCategoriesFromLocalStorage() {
 
 // Hàm lưu giá trị vào Local Storage
 
-function saveCategoryToLocalStorage(id,category) {
+function saveCategoryToLocalStorage(id,category,xoa) {
     let CATEGORIES = JSON.parse(localStorage.getItem('CATEGORIES')) || [];
     CATEGORIES.push({ID:id,name:category});
     localStorage.setItem('CATEGORIES', JSON.stringify(CATEGORIES));
@@ -184,7 +198,7 @@ function renderProduct(product, index) {
             <td>${product.code}</td>    
             <td><img width="120" height="80" src="images/${product.image}"></td>
             <td>${product.productName}</td>
-            <td>${product.idcategory === "0" ? "Giày Nam" : product.idcategory === "1" ? "Giày Nữ" : "Phụ Kiện"}</td>
+            <td>${product.idcategory === "0" ? "Jordan" : product.idcategory === "1" ? "nikes" : product.idcategory === "2" ? "adidas": product.idcategory === "3" ? "gucci": product.idcategory === "4" ? "yeezy": "oders brands"}</td>
             <td>${formatter.format(product.price)}</td>
             <td>${product.material}</td>
             <td>${product.amount}</td>
@@ -493,6 +507,7 @@ function renderCategoriesToTable() {
                     <th scope="col">${count++}</th>
                     <th scope="col">${CATEGORIES[i].ID}</th>
                     <th scope="col">${CATEGORIES[i].name}</th>
+                    
                 </tr>
                 `
         
@@ -666,7 +681,7 @@ function renderAccount() {
                 <td>${account.email}</td>
                 <td>${account.role}</td>
                 <td>
-                <button class="btn btn-primary" onclick="lockUnlockAccount('${account.ID}')">${account.status === 'Active' ? 'Mở Khóa' : ' khóa'}</button>
+                <button class="btn btn-primary" onclick="lockUnlockAccount('${account.ID}')">${account.status === 'true' ? 'Khóa' : ' Mở khóa'}</button>
             </td>
             </tr>
             `;

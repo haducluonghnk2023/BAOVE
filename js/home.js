@@ -184,8 +184,10 @@ let adminProfile = document.getElementById('adminProfile');
 let sign_btn = document.getElementById('signin');
 sign_btn.addEventListener('click', actSignIn);
 
+let valueOfAuthen;
 function actSignIn() {
-    let valueOfAuthen = authenticate(email_login.value, password_login.value);
+    valueOfAuthen = authenticate(email_login.value, password_login.value);
+    // console.log(valueOfAuthen);
     if (valueOfAuthen !== null) {
         alert('Đăng Nhập Thành Công !');
         sessionStorage.setItem('SESSION', JSON.stringify(valueOfAuthen));
@@ -282,8 +284,9 @@ function renderProfileDetail(account) {
         account.phoneNumber = p_number.value;
         account.email = p_email.value;
         account.address = p_address.value;
-        localStorage.setItem('ACCOUNTS', JSON.stringify(ACCOUNTS));
         alert('Update Thành Công !');
+        actProfileToggle();
+        localStorage.setItem('ACCOUNTS', JSON.stringify(ACCOUNTS));
     }
 }
 
@@ -373,6 +376,7 @@ function renderProduct(product) {
     owl_slide.innerHTML += contents;
 }
 
+// ==============================
 function renderExtraProduct(product) {
     let contents = `
     <div class="card text-center col-3 mb-2" data-aos="zoom-in-down">
@@ -479,39 +483,85 @@ addCarts.forEach(function (addCart) {
 })
 
 function addToCart() {
+    // valueOfAuthen = authenticate(email_login.value,password_login.value);
+    // // console.log(valueOfAuthen.userID);
+    // for (let i = 0; i < ACCOUNTS.length; i++) {
+    //     if(valueOfAuthen.userID == ACCOUNTS[i].ID){
+    //         if(ACCOUNTS[i].status){
+    //             console.log(ACCOUNTS[i].status);
+    //             let productCode = this.getAttribute('data-code');
+    //             let products = SESSION.products;
+    //             let productSaveCart;
+    //             PRODUCTS.forEach(p => {
+    //                 if (p.code === productCode) {
+    //                     productSaveCart = p;
+    //                 }
+    //             })
+    //             let { image, productName, price } = productSaveCart;
+    //             let product = {
+    //                 code: productCode,
+    //                 productName: productName,
+    //                 price: price,
+    //                 image: image,
+    //                 quantity: 1
+    //             }
+    //             if (products !== undefined) {
+    //                 let check = 0;
+    //                 products.forEach(p => {
+    //                     if (p.code === productCode) {
+    //                         p.quantity = p.quantity + 1;
+    //                         check++;
+    //                     }
+    //                 })
+    //                 if (check === 0) {
+    //                     products.push(product);
+    //                 }
+    //             } else {
+    //                 SESSION.products = [];
+    //                 SESSION.products.push(product);
+    //             }
+    //             sessionStorage.setItem('SESSION', JSON.stringify(SESSION));
+    //             alert('Thêm Sản Phẩm Vào Giỏ Hàng Thành Công !');
+                
+    //         }else {
+    //             alert('Tài Khoản Đã bị khóa !');
+    //         }
+    //     }
+    // }
     let productCode = this.getAttribute('data-code');
-    let products = SESSION.products;
-    let productSaveCart;
-    PRODUCTS.forEach(p => {
-        if (p.code === productCode) {
-            productSaveCart = p;
-        }
-    })
-    let { image, productName, price } = productSaveCart;
-    let product = {
-        code: productCode,
-        productName: productName,
-        price: price,
-        image: image,
-        quantity: 1
-    }
-    if (products !== undefined) {
-        let check = 0;
-        products.forEach(p => {
-            if (p.code === productCode) {
-                p.quantity = p.quantity + 1;
-                check++;
-            }
-        })
-        if (check === 0) {
-            products.push(product);
-        }
-    } else {
-        SESSION.products = [];
-        SESSION.products.push(product);
-    }
-    sessionStorage.setItem('SESSION', JSON.stringify(SESSION));
-    alert('Thêm Sản Phẩm Vào Giỏ Hàng Thành Công !');
+                let products = SESSION.products;
+                let productSaveCart;
+                PRODUCTS.forEach(p => {
+                    if (p.code === productCode) {
+                        productSaveCart = p;
+                    }
+                })
+                let { image, productName, price } = productSaveCart;
+                let product = {
+                    code: productCode,
+                    productName: productName,
+                    price: price,
+                    image: image,
+                    quantity: 1
+                }
+                if (products !== undefined) {
+                    let check = 0;
+                    products.forEach(p => {
+                        if (p.code === productCode) {
+                            p.quantity = p.quantity + 1;
+                            check++;
+                        }
+                    })
+                    if (check === 0) {
+                        products.push(product);
+                    }
+                } else {
+                    SESSION.products = [];
+                    SESSION.products.push(product);
+                }
+                sessionStorage.setItem('SESSION', JSON.stringify(SESSION));
+                alert('Thêm Sản Phẩm Vào Giỏ Hàng Thành Công !');
+    
 }
 
 
@@ -686,45 +736,6 @@ function validateForm() {
     }
 }
 
-function lockUnlockAccount(accountID) {
-    let account = ACCOUNTS.find(account => account.ID === accountID);
-    if (account) {
-        // Kiểm tra xem tài khoản đã đăng nhập chưa và trạng thái là false
-        if (account.status === 'false' && isLoggedIn(accountID)) {
-            // Thực hiện hành động khi tài khoản bị khóa và đã đăng nhập
-            alert("Tài khoản của bạn đã bị khóa và không thể mua hàng.");
-            return;
-        }
-
-        // Thay đổi trạng thái của tài khoản
-        account.status = account.status === 'true' ? 'false' : 'true';
-        
-        // Cập nhật trạng thái của tài khoản trong localStorage
-        localStorage.setItem('ACCOUNTS', JSON.stringify(ACCOUNTS));
-
-        renderAccount();
-    }
-}
-
-// Hàm kiểm tra xem người dùng đã đăng nhập hay chưa
-function isLoggedIn(accountID) {
-    // Ở đây, bạn có thể thực hiện kiểm tra bằng cách kiểm tra trạng thái đăng nhập từ một biến hoặc localStorage
-    // Ví dụ, nếu bạn lưu trạng thái đăng nhập của người dùng trong localStorage:
-    // let loggedInAccount = JSON.parse(localStorage.getItem('loggedInAccount'));
-    // return loggedInAccount && loggedInAccount.ID === accountID;
-
-    // Tạm thời, để minh họa, ta sẽ giả định rằng người dùng đã đăng nhập nếu có tài khoản ID
-    // Bạn cần điều chỉnh hàm này tương ứng với cách bạn xác định trạng thái đăng nhập của người dùng
-    return !!accountID;
-}
-
-function checkLocal(){
-    if(ACCOUNTS.status === "true"){
-        addToCart();
-    }else {
-        notificationAction("tài khoản bạn đã bị khóa , không thể mua hàng");
-    }
-}
 
 
 
