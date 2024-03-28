@@ -179,12 +179,34 @@ let image = document.getElementById("image");
 
 // Element Define
 let tbody = document.getElementById('tbody');
+let renderPagation = document.getElementsByClassName('pagination')[0]; 
+let currentPage = 1;
 window.onload = loadProductManager();
 
 function loadProductManager() {
-    tbody.innerHTML = ''
-    PRODUCTS.forEach((product,index) => {
-        renderProduct(product,index);
+    let itemPerPage = 2; // Số lượng sản phẩm trên mỗi trang
+    let totalPage = Math.ceil(PRODUCTS.length / itemPerPage);
+    let start = (currentPage - 1) * itemPerPage;
+    let end = currentPage * itemPerPage;
+    tbody.innerHTML = '';
+    renderPagation.innerHTML = '';
+    renderePagation();
+    PRODUCTS.forEach((product, index) => {
+        if (index >= start && index < end) {
+            renderProduct(product, index);
+        }
+    });
+
+    // Thêm sự kiện click cho các nút phân trang
+    let pageLinks = renderPagation.querySelectorAll('.page-link');
+    pageLinks.forEach(link => {
+        link.addEventListener('click', function(event) {
+            event.preventDefault(); // Ngăn chặn hành vi mặc định của thẻ a
+            let pageNumber = parseInt(this.textContent); // Lấy số trang từ nội dung của nút
+            console.log(pageNumber);
+            currentPage = pageNumber; // Cập nhật trang hiện tại
+            loadProductManager(); // Tải lại dữ liệu cho trang mới
+        });
     });
 }
 
@@ -198,7 +220,7 @@ function renderProduct(product, index) {
             <td>${product.code}</td>    
             <td><img width="120" height="80" src="images/${product.image}"></td>
             <td>${product.productName}</td>
-            <td>${product.idcategory === "0" ? "Jordan" : product.idcategory === "1" ? "nikes" : product.idcategory === "2" ? "adidas": product.idcategory === "3" ? "gucci": product.idcategory === "4" ? "yeezy": "oders brands"}</td>
+            <td>${product.idcategory === "Jordan" ? "Jordan" : product.idcategory === "nikes" ? "nikes" : product.idcategory === "adidas" ? "adidas": product.idcategory === "gucci" ? "gucci": product.idcategory === "yeezy" ? "yeezy": "oders brands"}</td>
             <td>${formatter.format(product.price)}</td>
             <td>${product.material}</td>
             <td>${product.amount}</td>
@@ -210,11 +232,32 @@ function renderProduct(product, index) {
             </td>
         </tr>
     `;
-
     // Chèn chuỗi HTML vào tbody
     tbody.innerHTML += newRow;
 }
 
+function renderePagation(){
+    renderPagation.innerHTML = 
+                                            `
+                                            <nav aria-label="Page navigation example" >
+                                                <ul class="pagination">
+                                                    <li class="page-item">
+                                                        <a class="page-link" href="#" aria-label="Previous">
+                                                        <span aria-hidden="true">&laquo;</span>
+                                                        </a>
+                                                    </li>
+                                                    <li class="page-item"><a class="page-link" href="#">1</a></li>
+                                                    <li class="page-item"><a class="page-link" href="#">2</a></li>
+                                                    <li class="page-item"><a class="page-link" href="#">3</a></li>
+                                                    <li class="page-item">
+                                                        <a class="page-link" href="#" aria-label="Next">
+                                                        <span aria-hidden="true">&raquo;</span>
+                                                        </a>
+                                                    </li>
+                                                </ul>
+                                            </nav>
+                                            `
+}
 
 // Thêm mới sản phẩm
 let add_new = document.getElementById('add_new');
