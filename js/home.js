@@ -18,7 +18,19 @@ function generateUUIDV4() {
 
 // ==================== DATABASE ==========================
 let DATABASE = localStorage.getItem('DATABASE') ? JSON.parse(localStorage.getItem('DATABASE')) : {
-    ACCOUNTS:  JSON.parse(localStorage.getItem("ACCOUNTS")) || [],
+    // ACCOUNTS: [
+    //     // Đặt vai trò mặc định của người dùng là ADMIN
+    //     {
+    //         ID: generateUUIDV4(),
+    //         username: "Hạ Đức Lương",
+    //         phoneNumber: "00000000000",
+    //         address: "Phú Thọ",
+    //         email: "admin@gmail.com",
+    //         password: "123",
+    //         role: "Admin"
+    //     }
+    // ],
+    ACCOUNTS:JSON.parse(localStorage.getItem("ACCOUNTS")) || [],
     ORDERS: JSON.parse(localStorage.getItem("ORDERS")) || [],
     PRODUCTS: JSON.parse(localStorage.getItem("PRODUCTS")) || [],
 };
@@ -27,11 +39,8 @@ let {PRODUCTS, ACCOUNTS, ORDERS } = DATABASE;
 localStorage.setItem('PRODUCTS', JSON.stringify(PRODUCTS));
 localStorage.setItem('ACCOUNTS', JSON.stringify(ACCOUNTS));
 localStorage.setItem('ORDERS', JSON.stringify(ORDERS));
-
-
-// ==================== SESSION STORE ==========================
-let SESSION = sessionStorage.getItem('SESSION') ? JSON.parse(sessionStorage.getItem('SESSION')) : null;
-
+// localStorage.setItem('ACCOUNTS', JSON.stringify(ACCOUNTS));
+// sessionStorage.setItem('ACCOUNTS', JSON.stringify(ACCOUNTS));
 
 // ========================================= CART CLIENT ===========================================
 let btn_cart = document.getElementById('btn-cart');
@@ -137,11 +146,18 @@ function addNewAccount() {
     if (validateFormRegister()) {
         ACCOUNTS.push(account);
         localStorage.setItem('ACCOUNTS', JSON.stringify(ACCOUNTS));
-        alert("Tạo Tài Khoản Thành Công !");
+        showSnackbar("Tạo tài khoản thành công")
         showSignForm();
     }
     register_btn.disabled = false;
 }
+function showSnackbar(message) {
+    let snackbar = document.getElementById('snackbar');
+    snackbar.textContent = message;
+    snackbar.className = "show"; // Hiển thị Snackbar
+    setTimeout(function(){ snackbar.className = snackbar.className.replace("show", ""); }, 3000); // Ẩn Snackbar sau 3 giây
+}
+
 function validateEmail(email) {
     return String(email)
     .toLowerCase()
@@ -187,14 +203,14 @@ sign_btn.addEventListener('click', actSignIn);
 let valueOfAuthen;
 function actSignIn() {
     valueOfAuthen = authenticate(email_login.value, password_login.value);
-    // console.log(valueOfAuthen);
+    console.log(valueOfAuthen);
     if (valueOfAuthen !== null) {
-        alert('Đăng Nhập Thành Công !');
         sessionStorage.setItem('SESSION', JSON.stringify(valueOfAuthen));
+        showSnackbar("Đăng nhập thành công")
         $('#form_account').modal('hide');
         checkSession();
     } else {
-        alert('Đăng Nhập Thất Bại !');
+        showSnackbar("Đăng nhập thất bại")
     }
 }
 
@@ -217,7 +233,6 @@ window.onload = checkSession();
 // Check Session Storage
 function checkSession() {
     SESSION = JSON.parse(sessionStorage.getItem('SESSION'));
-
     if (SESSION === null) {
         userAct.style.display = 'flex';
         userProfile.style.display = 'none';
@@ -284,7 +299,7 @@ function renderProfileDetail(account) {
         account.phoneNumber = p_number.value;
         account.email = p_email.value;
         account.address = p_address.value;
-        alert('Update Thành Công !');
+        showSnackbar('Update Thành Công !')
         actProfileToggle();
         localStorage.setItem('ACCOUNTS', JSON.stringify(ACCOUNTS));
     }
@@ -560,7 +575,7 @@ function addToCart() {
                     SESSION.products.push(product);
                 }
                 sessionStorage.setItem('SESSION', JSON.stringify(SESSION));
-                alert('Thêm Sản Phẩm Vào Giỏ Hàng Thành Công !');
+                showSnackbar("thêm vào giỏ hàng thành công")
     
 }
 
@@ -706,7 +721,7 @@ function actOrder() {
     if (validateForm()) {
         ORDERS.push(order);
         localStorage.setItem('ORDERS', JSON.stringify(ORDERS));
-        alert('Đặt hàng thành công !');
+        showSnackbar('Đặt hàng thành công !')
         SESSION.products = [];
         sessionStorage.setItem('SESSION', JSON.stringify(SESSION));
         location.reload();

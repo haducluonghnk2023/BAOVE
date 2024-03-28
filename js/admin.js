@@ -18,22 +18,8 @@ function generateUUIDV4() {
 
 // ==================== DATABASE ==========================
 let DATABASE = localStorage.getItem('DATABASE') ? JSON.parse(localStorage.getItem('DATABASE')) : {
-    // ACCOUNTS: [
-    //     // Đặt vai trò mặc định của người dùng là ADMIN
-    //     {
-    //         ID: generateUUIDV4(),
-    //         username: "Hạ Đức Lương",
-    //         phoneNumber: "00000000000",
-    //         address: "Phú Thọ",
-    //         email: "admin@gmail.com",
-    //         password: "123",
-    //         role: "Admin"
-    //     }
-    // ],
-    ACCOUNTS:  JSON.parse(localStorage.getItem("ACCOUNTS")) || [],
-    ORDERS: JSON.parse(localStorage.getItem("ORDERS")) || [],
-    PRODUCTS: JSON.parse(localStorage.getItem("PRODUCTS")) || [],
-    ADMIN: [
+    ACCOUNTS: [
+        // Đặt vai trò mặc định của người dùng là ADMIN
         {
             ID: generateUUIDV4(),
             username: "Hạ Đức Lương",
@@ -43,14 +29,28 @@ let DATABASE = localStorage.getItem('DATABASE') ? JSON.parse(localStorage.getIte
             password: "123",
             role: "Admin"
         }
-    ]
+    ],
+    ACCOUNTS:  JSON.parse(localStorage.getItem("ACCOUNTS")) || [],
+    ORDERS: JSON.parse(localStorage.getItem("ORDERS")) || [],
+    PRODUCTS: JSON.parse(localStorage.getItem("PRODUCTS")) || [],
+    // ADMIN: [
+    //     {
+    //         ID: generateUUIDV4(),
+    //         username: "Hạ Đức Lương",
+    //         phoneNumber: "00000000000",
+    //         address: "Phú Thọ",
+    //         email: "admin@gmail.com",
+    //         password: "123",
+    //         role: "Admin"
+    //     }
+    // ]
     
 };
 let {PRODUCTS, ACCOUNTS, ORDERS, ADMIN } = DATABASE;
 localStorage.setItem('PRODUCTS', JSON.stringify(PRODUCTS));
 localStorage.setItem('ACCOUNTS', JSON.stringify(ACCOUNTS));
 localStorage.setItem('ORDERS', JSON.stringify(ORDERS));
-localStorage.setItem('ADMIN',JSON.stringify(ADMIN));
+// localStorage.setItem('ADMIN',JSON.stringify(ADMIN));
 
 
 // localStorage.setItem('DATABASE', JSON.stringify(DATABASE));
@@ -475,6 +475,8 @@ let user_manager = document.getElementById('user-manager');
 let order_manager = document.getElementById('order-manager');
 let category_manager = document.getElementById('category-manager');
 
+let pageLink = document.querySelectorAll('.page-link'); 
+
 
 s_product.addEventListener('click', showProductManager);
 s_user.addEventListener('click', showUserManager);
@@ -491,6 +493,7 @@ function showProductManager() {
     user_manager.style.display = 'none';
     order_manager.style.display = 'none';
     category_manager.style.display = 'none';
+    pageLink.style.display = 'none';
     loadProductManager(PRODUCTS);
 }
 
