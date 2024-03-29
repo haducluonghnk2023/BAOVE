@@ -172,7 +172,7 @@ let currentPage = 1;
 window.onload = loadProductManager();
 
 function loadProductManager() {
-    let itemPerPage = 7; // Số lượng sản phẩm trên mỗi trang
+    let itemPerPage = 6; // Số lượng sản phẩm trên mỗi trang
     let totalPage = Math.ceil(PRODUCTS.length / itemPerPage);
     let start = (currentPage - 1) * itemPerPage;
     let end = currentPage * itemPerPage;
@@ -308,7 +308,7 @@ function validateForm(product) {
 }
 
 
-// Kiểm tra mã sản phẩm đã tồn tại 
+// Kiểm tra mã và tên sản phẩm đã tồn tại 
 function checkExistProductCodeAndName(code,name) {
     let check = 0;
     PRODUCTS.forEach(function (product) {

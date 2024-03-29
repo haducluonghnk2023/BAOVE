@@ -18,6 +18,8 @@
     <!-- ================================================================================================== -->
     <link rel="stylesheet" href="./css/home.css">
     <!-- ================================================================================================== -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.1/css/all.min.css" />
+    <!-- ================================================================================================== -->
     <style>
         body {
             font-size: 0.9em;
@@ -90,9 +92,11 @@
                                                     placeholder="Email">
                                             </div>
                                             <div class="form-group">
-                                                <label for="password1">Mật Khẩu: </label>
-                                                <input type="password" class="form-control" id="password-login"
+                                                <label for="password1">Mật Khẩu: 
+                                                </label>
+                                                <input style="position: relative;" type="password" class="form-control" id="password-login"
                                                     placeholder="Mật Khẩu">
+                                                    <span style="position: absolute; top: 172px;left: 460px;" id="btnPassword" class="fas fa-eye"></span>
                                             </div>
                                             <div class="text-center">
                                                 <button type="submit" class="btn btn-sm" id="signin">Đăng
@@ -495,7 +499,7 @@
                     <div class="promotion-content-banner">
                         <div class="content-banner">
                                 <h2 class="text-light">KHUYẾN MÃI <span class="text-warning">GIẢM GIÁ 50%</span></h2>
-                                <button class="btn btn-danger btn-sm">Xem Thêm</button>
+                                <!-- <button class="btn btn-danger btn-sm">Xem Thêm</button> -->
                         </div>
                     </div>
                 </div>
