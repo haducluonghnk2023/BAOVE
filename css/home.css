@@ -69,7 +69,9 @@ header {
 .header-top .bar-inner .bar-action .cart-overlay .cart-content {
     background-color: white;
     height: 100%;
+    overflow-y: auto; /* Kích hoạt thanh cuộn nếu nội dung vượt qua kích thước */
 }
+
 .header-top .bar-inner .bar-action .cart-overlay .cart-content img {
     width: 90px;
     height: 50px;
@@ -136,6 +138,7 @@ header {
     line-height: 45px;
     list-style-type: none;
 }
+
 .header-bottom .menu-bar ul li:hover {
     border-bottom: 3px solid brown;
 }
@@ -367,7 +370,7 @@ footer .input-group-addon {
 @keyframes fadein {
     from {
         bottom: 0;
-        opacity: 0;
+        ohacity: 0;
     }
     to {
         bottom: 30px;

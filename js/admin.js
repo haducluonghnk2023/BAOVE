@@ -18,35 +18,23 @@ function generateUUIDV4() {
 
 // ==================== DATABASE ==========================
 let DATABASE = localStorage.getItem('DATABASE') ? JSON.parse(localStorage.getItem('DATABASE')) : {
-    ACCOUNTS: [
-        // Đặt vai trò mặc định của người dùng là ADMIN
-        {
-            ID: generateUUIDV4(),
-            username: "Hạ Đức Lương",
-            phoneNumber: "00000000000",
-            address: "Phú Thọ",
-            email: "admin@gmail.com",
-            password: "123",
-            role: "Admin"
-        }
-    ],
-    ACCOUNTS:  JSON.parse(localStorage.getItem("ACCOUNTS")) || [],
-    ORDERS: JSON.parse(localStorage.getItem("ORDERS")) || [],
-    PRODUCTS: JSON.parse(localStorage.getItem("PRODUCTS")) || [],
-    // ADMIN: [
+    // ACCOUNTS: [
+    //     // Đặt vai trò mặc định của người dùng là ADMIN
     //     {
     //         ID: generateUUIDV4(),
     //         username: "Hạ Đức Lương",
-    //         phoneNumber: "00000000000",
+    //         phoneNumber: "0392096054",
     //         address: "Phú Thọ",
     //         email: "admin@gmail.com",
     //         password: "123",
     //         role: "Admin"
     //     }
-    // ]
-    
+    // ],
+    ACCOUNTS:  JSON.parse(localStorage.getItem("ACCOUNTS")) || [],
+    ORDERS: JSON.parse(localStorage.getItem("ORDERS")) || [],
+    PRODUCTS: JSON.parse(localStorage.getItem("PRODUCTS")) || [],
 };
-let {PRODUCTS, ACCOUNTS, ORDERS, ADMIN } = DATABASE;
+let {PRODUCTS, ACCOUNTS, ORDERS } = DATABASE;
 localStorage.setItem('PRODUCTS', JSON.stringify(PRODUCTS));
 localStorage.setItem('ACCOUNTS', JSON.stringify(ACCOUNTS));
 localStorage.setItem('ORDERS', JSON.stringify(ORDERS));
@@ -109,7 +97,7 @@ addButton.addEventListener('click', function() {
              // Hiển thị Snackbar
             showSnackbar("Đã thêm thành công!");
         } else {
-            alert("Danh mục đã tồn tại!");
+            showSnackbar('Danh mục đã tồn tại!')
         }
         renderCategoriesToTable();
 });
@@ -184,7 +172,7 @@ let currentPage = 1;
 window.onload = loadProductManager();
 
 function loadProductManager() {
-    let itemPerPage = 2; // Số lượng sản phẩm trên mỗi trang
+    let itemPerPage = 7; // Số lượng sản phẩm trên mỗi trang
     let totalPage = Math.ceil(PRODUCTS.length / itemPerPage);
     let start = (currentPage - 1) * itemPerPage;
     let end = currentPage * itemPerPage;
@@ -238,12 +226,12 @@ function renderProduct(product, index) {
 
 function renderePagation(){
     renderPagation.innerHTML = 
-                                            `
-                                            <nav aria-label="Page navigation example" >
-                                                <ul class="pagination">
+                                `
+                                            <nav id="navbar" aria-label="Page navigation example" >
+                                                <ul class="pagination justify-content-center">
                                                     <li class="page-item">
                                                         <a class="page-link" href="#" aria-label="Previous">
-                                                        <span aria-hidden="true">&laquo;</span>
+                                                            <span aria-hidden="true">&laquo;</span>
                                                         </a>
                                                     </li>
                                                     <li class="page-item"><a class="page-link" href="#">1</a></li>
@@ -251,12 +239,12 @@ function renderePagation(){
                                                     <li class="page-item"><a class="page-link" href="#">3</a></li>
                                                     <li class="page-item">
                                                         <a class="page-link" href="#" aria-label="Next">
-                                                        <span aria-hidden="true">&raquo;</span>
+                                                            <span aria-hidden="true">&raquo;</span>
                                                         </a>
                                                     </li>
                                                 </ul>
                                             </nav>
-                                            `
+                                `
 }
 
 // Thêm mới sản phẩm
@@ -276,8 +264,10 @@ function actAddProduct() {
         image: images.slice(12, images.length)
     }
 
-    if ((validateForm(product) === true) && (checkExistProductCode(product.code) === false)) {
-        PRODUCTS.push(product);
+    if ((validateForm(product) === true) && 
+    (checkExistProductCodeAndName(product.code,product.productName) === false) && 
+    (checkExistProductName(product.productName) === false)) {
+        PRODUCTS.push(product); 
         localStorage.setItem('PRODUCTS', JSON.stringify(PRODUCTS));
         renderProduct(product,PRODUCTS.length - 1);
         notificationAction("Thêm Sản Phẩm Thành Công.", "#12e64b");
@@ -319,23 +309,37 @@ function validateForm(product) {
 
 
 // Kiểm tra mã sản phẩm đã tồn tại 
-function checkExistProductCode(code) {
+function checkExistProductCodeAndName(code,name) {
     let check = 0;
     PRODUCTS.forEach(function (product) {
-        if (product.code === code) {
-            notificationAction("Mã Sản Phẩm Đã Tồn Tại.", "#e61212");
+        if (product.code === code &&  product.productName === name) {
+            notificationAction("Mã hoặc tên Sản Phẩm Đã Tồn Tại.", "#e61212");
             add_new.disabled = true;
             check++;
         }
     })
-
     if (check > 0) {
         return true;
     } else {
         return false;
     }
-
 }
+function checkExistProductName(name) {
+    let check = 0;
+    PRODUCTS.forEach(function (product) {
+        if (product.productName === name) {
+            notificationAction("Tên Sản Phẩm Đã Tồn Tại.", "#e61212");
+            add_new.disabled = true;
+            check++;
+        }
+    });
+    if (check > 0) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
 
 // Hiển thi thông báo
 let notifi = document.getElementById('notifi');
@@ -489,15 +493,17 @@ s_category.addEventListener('click', showCategoryManager);
 // });
 
 function showProductManager() {
+    document.getElementsByClassName("pagination")[0].style.display = 'block';
     product_manager.style.display = 'block';
     user_manager.style.display = 'none';
     order_manager.style.display = 'none';
     category_manager.style.display = 'none';
-    pageLink.style.display = 'none';
     loadProductManager(PRODUCTS);
 }
 
 function showUserManager() {
+    document.getElementsByClassName("pagination")[0].style.display = 'none';
+
     user_manager.style.display = 'block';
     product_manager.style.display = 'none';
     order_manager.style.display = 'none';
@@ -506,6 +512,8 @@ function showUserManager() {
 }
 
 function showOrderManager() {
+    document.getElementsByClassName("pagination")[0].style.display = 'none';
+
     product_manager.style.display = 'none';
     user_manager.style.display = 'none';
     order_manager.style.display = 'block';
@@ -513,6 +521,8 @@ function showOrderManager() {
     renderOrder();
 }
 function showCategoryManager(){
+    document.getElementsByClassName("pagination")[0].style.display = 'none';
+
     product_manager.style.display = 'none';
     user_manager.style.display = 'none';
     order_manager.style.display = 'none';

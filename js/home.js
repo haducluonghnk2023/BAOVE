@@ -34,7 +34,7 @@ let DATABASE = localStorage.getItem('DATABASE') ? JSON.parse(localStorage.getIte
     ORDERS: JSON.parse(localStorage.getItem("ORDERS")) || [],
     PRODUCTS: JSON.parse(localStorage.getItem("PRODUCTS")) || [],
 };
-
+let statuss = false
 let {PRODUCTS, ACCOUNTS, ORDERS } = DATABASE;
 localStorage.setItem('PRODUCTS', JSON.stringify(PRODUCTS));
 localStorage.setItem('ACCOUNTS', JSON.stringify(ACCOUNTS));
@@ -165,6 +165,13 @@ function validateEmail(email) {
         /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
     );
 };
+function validatePhoneNumber(phoneNumber) {
+    return /^\d{10}$/.test(phoneNumber);
+}
+function validatePassword(password) {
+    return password.length >= 8;
+}
+
 
 
 function validateFormRegister() {
@@ -172,10 +179,18 @@ function validateFormRegister() {
     let check = 0;
 
     register_input.forEach(input => {
-        if (input.value === '') {
+        if (input.value === '' && !validatePhoneNumber(input.value)) {
             input.style.border = "1px solid red";
             check++;// Tăng giá trị của biến check nếu có trường trống
-        } else {
+        } if (input.id === 'password' && !validatePassword(input.value)) {
+            input.style.border = "1px solid red";
+            check++;
+        }if (input.id === 'email' && !validateEmail(input.value)) {
+            input.style.border = "1px solid red";
+            check++;
+        }
+         else {
+            showSnackbar("vui lòng kiểm tra lại email,password,sđt")
             input.style.border = "1px solid #ced4da";
         }
     });
@@ -203,10 +218,10 @@ sign_btn.addEventListener('click', actSignIn);
 let valueOfAuthen;
 function actSignIn() {
     valueOfAuthen = authenticate(email_login.value, password_login.value);
-    console.log(valueOfAuthen);
     if (valueOfAuthen !== null) {
         sessionStorage.setItem('SESSION', JSON.stringify(valueOfAuthen));
         showSnackbar("Đăng nhập thành công")
+
         $('#form_account').modal('hide');
         checkSession();
     } else {
@@ -385,7 +400,7 @@ function renderProduct(product) {
             <div class="card-body">
                 <h5 class="card-title">${product.productName}</h5>
                 <p class="card-text">${formatter.format(product.price)}</p>
-                <button class="btn btn-primary btn-sm" id="addCart" data-code="${product.code}">Thêm Giỏ Hàng</button>
+                <button onclick="add()" class="btn btn-primary btn-sm" id="addCart" data-code="${product.code}">Thêm Giỏ Hàng</button>
             </div>
         </div>`;
     owl_slide.innerHTML += contents;
@@ -419,57 +434,67 @@ function renderAllProduct(product) {
     all_product.innerHTML += contents;
 }
 
-// **********************  FILTER PRODUCT **********************
-// let filter_option = document.getElementById('filter-option');
-// filter_option.addEventListener('change', filterProduct);
 
-// function filterProduct() {
-//     let option = filter_option.value;
-//     if (option === 'priceUp') {
-//         PRODUCTS.sort(function (p1, p2) {
-//             return p1.price - p2.price;
-//         })
-//         all_product.innerHTML = '';
-//         PRODUCTS.forEach(product => renderAllProduct(product));
-//     }
-//     if (option === 'priceDown') {
-//         PRODUCTS.sort(function (p1, p2) {
-//             return p2.price - p1.price;
-//         })
-//         all_product.innerHTML = '';
-//         PRODUCTS.forEach(product => renderAllProduct(product));
-//     }
-// }
-
-
-let filter_option = document.getElementById('filter-option');
-filter_option.addEventListener('change', filterProduct);
-function filterProduct() {
-    let option = filter_option.value;
-    if (option === 'priceUp' || option === 'priceDown') {
-        // Sắp xếp mảng PRODUCTS
-        if (option === 'priceUp') {
-            PRODUCTS.sort((p1, p2) => p1.price - p2.price);
-        } else if (option === 'priceDown') {
-            PRODUCTS.sort((p1, p2) => p2.price - p1.price);
-        }
-        // Cập nhật giao diện
-        updateProductDisplay();
+function add(){
+    if(statuss == false){
+        showSnackbar('Bạn chưa đăng nhập');
     }
 }
 
-function updateProductDisplay() {
-    // Lấy phần tử cha của tất cả sản phẩm
-    let parentElement = document.getElementById('all_product');
 
-    // Xóa tất cả các sản phẩm hiện có trong giao diện
-    parentElement.innerHTML = '';
+// **********************  FILTER PRODUCT **********************
+let filter_option = document.getElementById('filter-option');
+filter_option.addEventListener('change', filterProduct);
 
-    // Render lại các sản phẩm đã được sắp xếp
-    PRODUCTS.forEach(product => renderAllProduct(product));
+function filterProduct() {
+    let option = filter_option.value;
+    if (option === 'priceUp') {
+        PRODUCTS.sort(function (p1, p2) {
+            return p1.price - p2.price;
+        })
+        all_product.innerHTML = '';
+        PRODUCTS.forEach(product => renderAllProduct(product));
+    }
+    if (option === 'priceDown') {
+        PRODUCTS.sort(function (p1, p2) {
+            return p2.price - p1.price;
+        })
+        all_product.innerHTML = '';
+        PRODUCTS.forEach(product => renderAllProduct(product));
+    }
 }
 
+
+// let filter_option = document.getElementById('filter-option');
+// filter_option.addEventListener('change', filterProduct);
+// function filterProduct() {
+//     let option = filter_option.value;
+//     if (option === 'priceUp' || option === 'priceDown') {
+//         // Sắp xếp mảng PRODUCTS
+//         if (option === 'priceUp') {
+//             PRODUCTS.sort((p1, p2) => p1.price - p2.price);
+//         } else if (option === 'priceDown') {
+//             PRODUCTS.sort((p1, p2) => p2.price - p1.price);
+//         }
+//         // Cập nhật giao diện
+//         updateProductDisplay();
+//     }
+// }
+
+// function updateProductDisplay() {
+//     // Lấy phần tử cha của tất cả sản phẩm
+//     let parentElement = document.getElementById('all_product');
+
+//     // Xóa tất cả các sản phẩm hiện có trong giao diện
+//     parentElement.innerHTML = '';
+
+//     // Render lại các sản phẩm đã được sắp xếp
+//     PRODUCTS.forEach(product => renderAllProduct(product));
+// }
+
 // ****************** Search ********************************
+
+
 let search = document.getElementById("search");
 search.addEventListener('input', actSearch);
 
@@ -543,6 +568,7 @@ function addToCart() {
     //         }
     //     }
     // }
+    
     let productCode = this.getAttribute('data-code');
                 let products = SESSION.products;
                 let productSaveCart;
@@ -612,7 +638,7 @@ function renderCartDetail() {
             </td>
             <td>${formatter.format(p.price * p.quantity)}</td>
             <td>
-                <i class="fas fa-times text-danger" id="remove" data-code="${p.code}"></i>
+                <i class="fas fa-times text-danger"  id="remove" data-code="${p.code}"></i>
             </td>
         </tr> `;
         total_price += p.price * p.quantity;
@@ -635,6 +661,7 @@ function renderCartDetail() {
     `;
     loadUserInfo();
 }
+
 function loadUserInfo() {
     ACCOUNTS.forEach(function (account) {
         if (account.ID === SESSION.userID) {
@@ -677,11 +704,13 @@ function actCartProduct(event) {
         updateCartProduct(data_code, nValue);
     }
     if (ev.matches('#remove')) {
-        let products = SESSION.products;
-        products = products.filter(product => product.code !== data_code);
-        SESSION.products = products;
-        sessionStorage.setItem('SESSION', JSON.stringify(SESSION));
-        renderCartDetail();
+       if(confirm("bạn có muốn xóa sản phẩm không!")){
+            let products = SESSION.products;
+            products = products.filter(product => product.code !== data_code);
+            SESSION.products = products;
+            sessionStorage.setItem('SESSION', JSON.stringify(SESSION));
+            renderCartDetail();
+       }
     }
 }
 function updateCartProduct(code, nQuantity) {
@@ -721,10 +750,11 @@ function actOrder() {
     if (validateForm()) {
         ORDERS.push(order);
         localStorage.setItem('ORDERS', JSON.stringify(ORDERS));
-        showSnackbar('Đặt hàng thành công !')
         SESSION.products = [];
         sessionStorage.setItem('SESSION', JSON.stringify(SESSION));
         location.reload();
+        // showSnackbar('Đặt hàng thành công !')
+        alert("bạn đã đặt hàng thành công!")
     }
 
     order_btn.disabled = false;
@@ -750,9 +780,4 @@ function validateForm() {
         return true;
     }
 }
-
-
-
-
-
 
